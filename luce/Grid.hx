@@ -9,15 +9,15 @@ typedef GridConfig = {
 	cellHeight: Float,
 }
 
-class UIGrid extends UIWidget {
+class Grid extends Widget {
 	public var cols(default,null): Int;
 	public var rows(default,null): Int;
 	public var cellWidth(default,null): Float;
 	public var cellHeight(default,null): Float;
 
-	var grid = new Array<Array<UIWidget>>();
+	var grid = new Array<Array<Widget>>();
 	
-	override public function new( batch: UIBatch, shift: Int, args_: UIWidget.WidgetConfig ) {
+	override public function new( batch: Batch, shift: Int, args_: Widget.WidgetConfig ) {
 		super( batch, shift, args_ );
 	
 		var args = args_.grid;
@@ -43,7 +43,7 @@ class UIGrid extends UIWidget {
 		cellHeight = args.cellHeight;		
 
 		for ( x in 0...cols ) {
-			grid[x] = new Array<UIWidget>();
+			grid[x] = new Array<Widget>();
 			for ( y in 0...rows ) {
 				// TODO: more parent
 				// TODO: align (now center)

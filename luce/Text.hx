@@ -16,7 +16,7 @@ typedef TextConfig = {
 	?spaceWidth: Float,
 }
 
-class UIText extends UIWidget {
+class Text extends Widget {
 	public static inline var Center: Int = 0;
 	public static inline var Left: Int = 1;
 	public static inline var Right: Int = 2;
@@ -25,7 +25,7 @@ class UIText extends UIWidget {
 	public static inline var SPACE: Int = -0xffe;
 
 	public var length(default,null): Int = 0;
-	public var glyphs(default,null): Vector<UIWidget>;
+	public var glyphs(default,null): Vector<Widget>;
 	public var codes(default,null): Vector<Int>;
 	public var align(default,null): Int;
 	public var mapping(default,null): Map<Int,Float>;
@@ -45,11 +45,11 @@ class UIText extends UIWidget {
 		return w;
 	}
 
-	override public function new( batch: UIBatch, shift: Int, args_: UIWidget.WidgetConfig ) {
+	override public function new( batch: Batch, shift: Int, args_: Widget.WidgetConfig ) {
 		super( batch, shift, args_ );
 	
 		var args = args_.text;
-		glyphs = new Vector<UIWidget>( args.count );
+		glyphs = new Vector<Widget>( args.count );
 		codes = new Vector<Int>( args.count );
 		align = args.align != null ? args.align : Center;
 		mapping = args.mapping;

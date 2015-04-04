@@ -8,11 +8,11 @@ typedef NinePatchConfig = {
 	frames: Array<String>,
 }
 
-class UINinePatch extends UIWidget {
+class NinePatch extends Widget {
 	
-	public var nineWidgets(default,null) = new Vector<UIWidget>( 9 );
+	public var nineWidgets(default,null) = new Vector<Widget>( 9 );
 	
-	override public function new( batch: UIBatch, shift: Int, args_: UIWidget.WidgetConfig ) {
+	override public function new( batch: Batch, shift: Int, args_: Widget.WidgetConfig ) {
 		super( batch, shift, args_ );
 	
 		var args = args_.ninepatch;
@@ -29,7 +29,7 @@ class UINinePatch extends UIWidget {
 				yscl: ( i == 3 || i == 4 || i == 5 ) ? this : null, frame: this, visible: this }} );
 		}
 
-		setFramesList( [for ( i in 0...nineWidgets[0].framesList.length ) UIAtlas.NULL] );
+		setFramesList( [for ( i in 0...nineWidgets[0].framesList.length ) Atlas.NULL] );
 		
 		if ( args_.frame != null ) frame = args_.frame;
 	}

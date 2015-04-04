@@ -24,7 +24,7 @@ typedef TexturePackerJsonArray = {
 	frames: Array< TexturePackerJsonFrame>
 }
 
-class UIAtlas {
+class Atlas {
 	public var ids(default,null) = new Map<String, Float>();
 	public var rects(default,null) = new Array<Rectangle>();
 	public var centers(default,null) = new Array<Point>();
@@ -111,7 +111,7 @@ class UIAtlas {
 	}
 
 	public static function fromTexturePackerJsonHash( data: TexturePackerJsonHash, imagePath: String ) {
-		var self = new UIAtlas( imagePath );
+		var self = new Atlas( imagePath );
 		
 		for ( filename in Reflect.fields( data.frames )  ) {
 			self.addTexturePackerFrame( Reflect.field( data.frames, filename ), filename );
@@ -120,7 +120,7 @@ class UIAtlas {
 	}
 
 	public static function fromTexturePackerJsonArray( data: TexturePackerJsonArray, imagePath: String ) {
-		var self = new UIAtlas( imagePath );		
+		var self = new Atlas( imagePath );		
 		
 		for ( frame in data.frames ) {
 		 	self.addTexturePackerFrame( frame );

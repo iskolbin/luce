@@ -6,19 +6,19 @@ import luce.utils.Tween;
 import haxe.ds.Vector;
 
 private typedef LinksStruct = {
-	?x: UIWidget,
-	?y: UIWidget,
-	?frame: UIWidget,
-	?xscl: UIWidget,
-	?yscl: UIWidget,
-	?xskw: UIWidget,
-	?yskw: UIWidget,
-	?rot: UIWidget,
-	?red: UIWidget,
-	?green: UIWidget,
-	?blue: UIWidget,
-	?alpha: UIWidget,
-	?visible: UIWidget,
+	?x: Widget,
+	?y: Widget,
+	?frame: Widget,
+	?xscl: Widget,
+	?yscl: Widget,
+	?xskw: Widget,
+	?yskw: Widget,
+	?rot: Widget,
+	?red: Widget,
+	?green: Widget,
+	?blue: Widget,
+	?alpha: Widget,
+	?visible: Widget,
 	?centrify: Bool,
 }
 
@@ -42,19 +42,19 @@ typedef WidgetConfig = {
 	?visible: Bool,
 	?hit: Array<Float>,
 	?block: Bool,
-	?onPress: UIWidget->Void,
-	?onRelease: UIWidget->Void,
-	?onStop: UIWidget->Void,
+	?onPress: Widget->Void,
+	?onRelease: Widget->Void,
+	?onStop: Widget->Void,
 	?frames: Array<String>,
 	?framesList: Array<Float>,
 	?parent: LinksStruct,
-	?text: UIText.TextConfig,
-	?grid: UIGrid.GridConfig,
-	?ninepatch: UINinePatch.NinePatchConfig,
+	?text: Text.TextConfig,
+	?grid: Grid.GridConfig,
+	?ninepatch: NinePatch.NinePatchConfig,
 }
 
-private class UIWidgetLink {
-	public var widget: UIWidget;
+private class WidgetLink {
+	public var widget: Widget;
 	public var attrInit: Float;
 	public inline function new( widget, attrInit ) {
 		this.widget = widget;
@@ -62,7 +62,7 @@ private class UIWidgetLink {
 	}
 }
 
-class UIWidget implements Tween.Tweenable {
+class Widget implements Tween.Tweenable {
 	static var NULL_FRAMES:Array<Float> = [0];
 	static var NULL_ARGS:WidgetConfig = {};
 
@@ -89,8 +89,8 @@ class UIWidget implements Tween.Tweenable {
 	public var frameIdx(default,null): Float = 0;
 	var framesList: Array<Float> = null;
 	var links = { 
-		var links = new Vector<Array<UIWidgetLink>>( N_ATTR );
-		for ( i in 0...N_ATTR ) links[i] = new Array<UIWidgetLink>();
+		var links = new Vector<Array<WidgetLink>>( N_ATTR );
+		for ( i in 0...N_ATTR ) links[i] = new Array<WidgetLink>();
 		links;
 	}
 	var sin_: Float = 0;
@@ -137,12 +137,12 @@ class UIWidget implements Tween.Tweenable {
 	public var enabled(get,set): Bool;
 	public var visible(get,set): Bool;
 
-	static function doNothing( self: UIWidget ): Void {} 
+	static function doNothing( self: Widget ): Void {} 
 
-	public var onPress: UIWidget->Void = doNothing;
-	public var onRelease: UIWidget->Void = doNothing;
+	public var onPress: Widget->Void = doNothing;
+	public var onRelease: Widget->Void = doNothing;
 
-	var visibleLink: Array<UIWidget>;
+	var visibleLink: Array<Widget>;
 
 	inline function testFlag( flag: Int ) return ( flags & flag ) != 0;
 	inline function unsetFlag( flag: Int ) flags &= ~flag;
@@ -196,7 +196,7 @@ class UIWidget implements Tween.Tweenable {
 		if ( block ) setFlag( Block ) else unsetFlag( Block ); 
 		return block; }
 
-	public var batch(default,null): UIBatch;
+	public var batch(default,null): Batch;
 	
 	public inline function getAttr( attr: Int ) return this.attr[attr];
 	inline function sum( attr: Int ) return this.attr[attr] + this.attrAdd[attr];
@@ -322,7 +322,7 @@ class UIWidget implements Tween.Tweenable {
 
 
 	inline function updateFrame() {
-		frameIdx = (!testFlag( Invisible ) && !testFlag( InvisibleAdd )) ? framesList[Std.int( attr[Frame] + attrAdd[Frame] )] : UIAtlas.NULL; 
+		frameIdx = (!testFlag( Invisible ) && !testFlag( InvisibleAdd )) ? framesList[Std.int( attr[Frame] + attrAdd[Frame] )] : Atlas.NULL; 
 		batch.setFrame( shift, frameIdx ); 
 	}
 	
@@ -356,17 +356,17 @@ class UIWidget implements Tween.Tweenable {
 		updateFrame();
 	}
 
-	public function addLink( child: UIWidget, attr: Int, ?centrify: Bool ) {
+	public function addLink( child: Widget, attr: Int, ?centrify: Bool ) {
 		if ( centrify == true ) {
-			links[attr].push( new UIWidgetLink( child, 0 ));
+			links[attr].push( new WidgetLink( child, 0 ));
 		} else {
-			links[attr].push( new UIWidgetLink( child, this.attr[attr] + this.attrAdd[attr] ));
+			links[attr].push( new WidgetLink( child, this.attr[attr] + this.attrAdd[attr] ));
 		}
 	}
 
-	public function addVisibleLink( child: UIWidget ) {
+	public function addVisibleLink( child: Widget ) {
 		if ( visibleLink == null ) {
-			visibleLink = new Array<UIWidget>();
+			visibleLink = new Array<Widget>();
 		}
 
 		visibleLink.push( child );
@@ -374,7 +374,7 @@ class UIWidget implements Tween.Tweenable {
 		updateSingleVisibleLink( visibleLink.length-1 );
 	}
 
-	public function removeVisibleLink( child: UIWidget ) {
+	public function removeVisibleLink( child: Widget ) {
 		if ( visibleLink != null ) {
 			var idx = visibleLink.indexOf( child );
 			if ( idx >= 0 ) {
@@ -383,7 +383,7 @@ class UIWidget implements Tween.Tweenable {
 		}
 	}
 
-	public function removeLink( child: UIWidget, attr: Int ) {
+	public function removeLink( child: Widget, attr: Int ) {
 		for ( i in 0...links[attr].length ) {
 			if ( links[attr][i].widget == child ) {
 				links[attr][i].widget.attrAdd[attr] = 0;
@@ -521,7 +521,7 @@ class UIWidget implements Tween.Tweenable {
 		if ( links.visible != null ) links.visible.addVisibleLink( this );
 	}
 
-	public function new( batch: UIBatch, shift: Int, ?args: WidgetConfig ) {
+	public function new( batch: Batch, shift: Int, ?args: WidgetConfig ) {
 		args = args != null ? args : NULL_ARGS;
 		this.batch = batch;
 		this.shift = shift; 

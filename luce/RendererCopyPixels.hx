@@ -3,7 +3,7 @@ package luce;
 import openfl.geom.Point;
 import openfl.display.BitmapData;
 
-class UIRendererCopyPixels implements UIBatch.BatchRenderer {
+class RendererCopyPixels implements Batch.BatchRenderer {
 	var xy = new Array<Point>();
 	var zeroPoint = new Point( 0, 0 );
 	var buffer: BitmapData;
@@ -12,7 +12,7 @@ class UIRendererCopyPixels implements UIBatch.BatchRenderer {
 		this.buffer = buffer;
 	}
 
-	public inline function render( batch: UIBatch ) {
+	public inline function render( batch: Batch ) {
 		var shift = 0;
 		
 		while ( xy.length < batch.count ) {
@@ -21,7 +21,7 @@ class UIRendererCopyPixels implements UIBatch.BatchRenderer {
 		
 		for ( i in 0...batch.count) {
 			var id_ = batch.getFrame(shift);
-			if ( id_ != UIAtlas.NULL ) {
+			if ( id_ != Atlas.NULL ) {
 				var id = Std.int( id_ );
 				var c = batch.atlas.centers[id];
 				var rect = batch.atlas.rects[id];
@@ -30,7 +30,7 @@ class UIRendererCopyPixels implements UIBatch.BatchRenderer {
 				p.y = batch.getCY( shift ) - c.y;
 				buffer.copyPixels( batch.atlas.bitmapData, rect, p, null, zeroPoint, true);																					
 			}
-			shift += UIBatch.WGT_SIZE;
+			shift += Batch.WGT_SIZE;
 		}
 	}
 }

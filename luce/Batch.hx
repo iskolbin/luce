@@ -11,16 +11,16 @@ import openfl.geom.Point;
 import de.polygonal.Printf;
 
 interface BatchRenderer {
-	public function render( batch: UIBatch ): Void;
+	public function render( batch: Batch ): Void;
 }
 
-class UIBatch {
+class Batch {
 	public static inline var WGT_SIZE = 11;
 
-	public var namedWidgets(default,null) = new Map<String,UIWidget>();
+	public var namedWidgets(default,null) = new Map<String,Widget>();
 	public var renderList(default,null) = new Array<Float>();
-	public var buttonList(default,null) = new Array<UIWidget>();
-	public var atlas(default,null): UIAtlas;	
+	public var buttonList(default,null) = new Array<Widget>();
+	public var atlas(default,null): Atlas;	
 	public var altered(default,null) = true;
 	public var centerX(default,null): Float = 0;
 	public var centerY(default,null): Float = 0;
@@ -38,28 +38,28 @@ class UIBatch {
 		altered = true;
 	}
 
-	public function new( atlas: UIAtlas, renderer: BatchRenderer  ) {
+	public function new( atlas: Atlas, renderer: BatchRenderer  ) {
 		this.atlas = atlas;
 		this.renderer = renderer;
 	}
 
 	public inline function alter() altered = true;
 
-	public inline function newWidget( args: UIWidget.WidgetConfig ) {
+	public inline function newWidget( args: Widget.WidgetConfig ) {
 		var shift = renderList.length;
 
 		for ( i in 0...WGT_SIZE ) {
 			renderList.push( 0 );
 		}
 			
-		var wgt: UIWidget = if ( args.text != null ) {
-			new UIText( this, shift, args );
+		var wgt: Widget = if ( args.text != null ) {
+			new Text( this, shift, args );
 		} else if ( args.grid != null ) {
-			new UIGrid( this, shift, args );
+			new Grid( this, shift, args );
 		} else if ( args.ninepatch != null ) {
-			new UINinePatch( this, shift, args );
+			new NinePatch( this, shift, args );
 		} else {
-			new UIWidget( this, shift, args );
+			new Widget( this, shift, args );
 		}
 
 		if ( wgt.isButton() ) {
@@ -75,17 +75,18 @@ class UIBatch {
 		return wgt;
 	}
 
-	public function newText( args: UIWidget.WidgetConfig ): UIText {
+	public function newText( args: Widget.WidgetConfig ): Text {
 		if ( args.text == null ) throw ".text field needed for creating text";
 		return cast newWidget( args );
 	}
 	
-	public function newGrid( args: UIWidget.WidgetConfig ): UIGrid {
+	public function newGrid( args: Widget.WidgetConfig ): Grid {
 		if ( args.grid == null ) throw ".grid field needed for creating grid";
 		return cast newWidget( args );
 	}
 
-	public function newNinePatch( args: UIWidget.WidgetConfig ): UINinePatch {
+	// NOT USE!
+	public function newNinePatch( args: Widget.WidgetConfig ): NinePatch {
 		if ( args.ninepatch == null ) throw ".ninepatch field needed for creating ninepatch";
 		return cast newWidget( args );
 	}
