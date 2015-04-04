@@ -4,11 +4,11 @@
 	"license": "MIT",
 	"tags": ["openfl"],
 	"description": "Luce is minimal OpenFL drawing library based mainly on drawTiles method of Tilesheet class.",
-	"version": "1.0.0",
+	"version": "0.0.1",
 	"releasenote": "Initial release.",
 	"contributors": ["iskolbin"],
 	"dependencies": {
-		"luce-utils": "1.0.0",
-		"openfl": "2.2.8"
+		"luce-utils": "",
+		"openfl": ""
 	}
 }
