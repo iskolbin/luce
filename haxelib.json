@@ -1,0 +1,14 @@
+{
+	"name": "luce",
+	"url" : "https://github.com/iskolbin/luce",
+	"license": "MIT",
+	"tags": ["openfl"],
+	"description": "This library is useless in the same way on every platform.",
+	"version": "1.0.0",
+	"releasenote": "Initial release, everything is working correctly.",
+	"contributors": ["Juraj","Jason","Nicolas"],
+	"dependencies": {
+		"luce-utils": "1.0.0",
+		"openfl": "2.2.8"
+	}
+}
