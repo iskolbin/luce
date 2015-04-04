@@ -1,3 +1,5 @@
+package luce;
+
 import openfl.geom.Point;
 import openfl.display.BitmapData;
 

@@ -1,3 +1,5 @@
+package luce;
+
 import openfl.display.Graphics;
 import openfl.display.Tilesheet;
 

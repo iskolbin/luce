@@ -1,3 +1,5 @@
+package luce;
+
 import haxe.ds.Vector;
 
 typedef TextConfig = {

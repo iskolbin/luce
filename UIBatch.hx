@@ -1,8 +1,9 @@
-// batch_no_altered_test -- не проверять, изменилось ли что либо перед перерисовкой
-// batch_no_changed_test -- не проверять, изменилось ли что либо по факту перед перерисовкой
-// batch_no_round_xy -- перед выводом не округлять координаты
+package luce;
 
-package ;
+// Compiler defs:
+// 
+// batch_no_altered_test -- dont test batch for altering
+// batch_no_changed_test -- dont test batch for actual change
 
 import openfl.display.Tilesheet;
 import openfl.display.BitmapData;

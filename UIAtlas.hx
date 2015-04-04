@@ -1,4 +1,4 @@
-package;
+package luce;
 
 import openfl.Assets;
 import openfl.display.Tilesheet;
@@ -51,6 +51,7 @@ class UIAtlas {
 		}
 	}
 
+	// NOT USE!
 	// 1 2 3
 	// 4 5 6
 	// 7 8 9

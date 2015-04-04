@@ -1,3 +1,5 @@
+package luce;
+
 typedef GridConfig = {
 	?framesList: Array<Float>,
 	?frames: Array<String>,

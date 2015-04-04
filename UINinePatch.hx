@@ -1,4 +1,6 @@
-package;
+// NOT USE!
+
+package luce;
 
 import haxe.ds.Vector;
 
