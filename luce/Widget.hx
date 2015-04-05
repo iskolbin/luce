@@ -54,7 +54,6 @@ typedef WidgetConfig = {
 	?parent: LinksStruct,
 	?text: Text.TextConfig,
 	?grid: Grid.GridConfig,
-	?ninepatch: NinePatch.NinePatchConfig,
 }
 
 private class WidgetLink {
