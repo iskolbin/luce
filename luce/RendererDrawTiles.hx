@@ -13,7 +13,6 @@ class RendererDrawTiles implements Batch.BatchRenderer {
 	}
 
 	public inline function render( batch: Batch ) {
-		graphics.clear();
 		batch.atlas.tilesheet.drawTiles( graphics, batch.renderList, smooth, RENDER_FLAGS );
 	}	
 }
