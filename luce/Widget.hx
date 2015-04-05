@@ -207,8 +207,8 @@ class Widget implements Tween.Tweenable {
 	public inline function getAttrWorld( attr: Int ) return sum( attr );
 
 	public inline function pointInside( xp: Float, yp: Float ) {
-		var wx = getAttrWorld( X );
-		var wy = getAttrWorld( Y );
+		var wx = sum( X );
+		var wy = sum( Y );
 		return xp >= wx + hit[0] && yp >= wy + hit[1] && xp <= wx+hit[2] && yp <= wy+hit[3]; 
 	}
 
@@ -221,8 +221,8 @@ class Widget implements Tween.Tweenable {
 	inline function updateCentred() if ( sum( XPiv ) == 0.0 && sum( YPiv ) == 0.0 ) unsetFlag( NotCentred ) else setFlag( NotCentred );
 
 	inline function updatePivot() {
-		batch.setX( shift, sum(X) - sum(XPiv)*batch.getTA( shift ) - sum(YPiv)*batch.getTB( shift ) + sum(XPiv));
-		batch.setY( shift, sum(Y) - sum(XPiv)*batch.getTC( shift ) - sum(YPiv)*batch.getTD( shift ) + sum(YPiv));
+		batch.setX( shift, sum(X) + sum(XPiv)*batch.getTA( shift ) + sum(YPiv)*batch.getTB( shift ) - sum(XPiv));
+		batch.setY( shift, sum(Y) + sum(XPiv)*batch.getTC( shift ) + sum(YPiv)*batch.getTD( shift ) - sum(YPiv));
 	}
 
 	inline function updateX() {
@@ -242,15 +242,12 @@ class Widget implements Tween.Tweenable {
 	}
 
 	inline function updateXScl() {
-		trace( 'enter' );
 		if ( testFlag( Rotated )) {
 			batch.setTA( shift, cos_ * sum(XScl) - sin_ * sum(YSkw) );
 			batch.setTB( shift, sin_ * sum(XScl) + cos_ * sum(YSkw) );
 		} else {
-			trace( 'set' );
 			batch.setTA( shift, sum(XScl) );
 		}
-		trace( 'pivot' );
 		if ( testFlag( NotCentred )) {
 			updatePivot();
 		}

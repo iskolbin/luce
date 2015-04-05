@@ -56,8 +56,6 @@ class Batch {
 			new Text( this, shift, args );
 		} else if ( args.grid != null ) {
 			new Grid( this, shift, args );
-		} else if ( args.ninepatch != null ) {
-			new NinePatch( this, shift, args );
 		} else {
 			new Widget( this, shift, args );
 		}
@@ -82,12 +80,6 @@ class Batch {
 	
 	public function newGrid( args: Widget.WidgetConfig ): Grid {
 		if ( args.grid == null ) throw ".grid field needed for creating grid";
-		return cast newWidget( args );
-	}
-
-	// NOT USE!
-	public function newNinePatch( args: Widget.WidgetConfig ): NinePatch {
-		if ( args.ninepatch == null ) throw ".ninepatch field needed for creating ninepatch";
 		return cast newWidget( args );
 	}
 
