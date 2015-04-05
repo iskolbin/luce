@@ -20,6 +20,8 @@ private typedef LinksStruct = {
 	?green: Widget,
 	?blue: Widget,
 	?alpha: Widget,
+	?xpiv: Widget,
+	?ypiv: Widget,
 	?visible: Widget,
 	?centrify: Bool,
 }
@@ -506,7 +508,7 @@ class Widget implements Tween.Tweenable {
 		}
 	}
 
-	public inline function addParentTransformLinks( parent: Widget, centrify: Bool ) {
+	public inline function addParentTransformLinks( parent: Widget, c: Bool ) {
 		parent.addLink( this, X, c );
 		parent.addLink( this, Y, c );
 		parent.addLink( this, XScl, c );
@@ -518,7 +520,7 @@ class Widget implements Tween.Tweenable {
 		parent.addLink( this, YPiv, c );
 	}
 
-	public inline function addParentColorLinks( parent: Widget, centrify: Bool ) {
+	public inline function addParentColorLinks( parent: Widget, c: Bool ) {
 		parent.addLink( this, Red, c );
 		parent.addLink( this, Green, c );
 		parent.addLink( this, Blue, c );
