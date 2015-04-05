@@ -10,5 +10,6 @@
 	"dependencies": {
 		"luce-utils": "",
 		"openfl": ""
+		"polygonal-printf": "",
 	}
 }
