@@ -9,7 +9,7 @@
 	"contributors": ["iskolbin"],
 	"dependencies": {
 		"luce-utils": "",
-		"openfl": ""
+		"openfl": "",
 		"polygonal-printf": "",
 	}
 }
