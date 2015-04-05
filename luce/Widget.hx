@@ -6,6 +6,8 @@ import luce.utils.Tween;
 import haxe.ds.Vector;
 
 private typedef LinksStruct = {
+	?transform: Widget,
+	?color: Widget,
 	?x: Widget,
 	?y: Widget,
 	?frame: Widget,
@@ -504,20 +506,49 @@ class Widget implements Tween.Tweenable {
 		}
 	}
 
+	public inline function addParentTransformLinks( parent: Widget, centrify: Bool ) {
+		parent.addLink( this, X, c );
+		parent.addLink( this, Y, c );
+		parent.addLink( this, XScl, c );
+		parent.addLink( this, YScl, c );
+		parent.addLink( this, XSkw, c );
+		parent.addLink( this, YSkw, c );
+		parent.addLink( this, Rot, c );
+		parent.addLink( this, XPiv, c );
+		parent.addLink( this, YPiv, c );
+	}
+
+	public inline function addParentColorLinks( parent: Widget, centrify: Bool ) {
+		parent.addLink( this, Red, c );
+		parent.addLink( this, Green, c );
+		parent.addLink( this, Blue, c );
+		parent.addLink( this, Alpha, c );
+	}
+
 	public inline function addParentLinks( links: LinksStruct ) {
 		var c = links.centrify == true;
-		if ( links.x != null ) links.x.addLink( this, X, c );
-		if ( links.y != null ) links.y.addLink( this, Y, c );
 		if ( links.frame != null ) links.frame.addLink( this, Frame, c );
-		if ( links.xscl != null ) links.xscl.addLink( this, XScl, c );
-		if ( links.yscl != null ) links.yscl.addLink( this, YScl, c );
-		if ( links.xskw != null ) links.xskw.addLink( this, XSkw, c );
-		if ( links.yskw != null ) links.yskw.addLink( this, YSkw, c );
-		if ( links.rot != null ) links.rot.addLink( this, Rot, c );
-		if ( links.red != null ) links.red.addLink( this, Red, c );
-		if ( links.green != null ) links.green.addLink( this, Green, c );
-		if ( links.blue != null ) links.blue.addLink( this, Blue, c );
-		if ( links.alpha != null ) links.alpha.addLink( this, Alpha, c );
+		if ( links.transform != null ) {
+			addParentTransformLinks( links.transform, c );
+		} else {
+			if ( links.x != null ) links.x.addLink( this, X, c );
+			if ( links.y != null ) links.y.addLink( this, Y, c );
+			if ( links.xscl != null ) links.xscl.addLink( this, XScl, c );
+			if ( links.yscl != null ) links.yscl.addLink( this, YScl, c );
+			if ( links.xskw != null ) links.xskw.addLink( this, XSkw, c );
+			if ( links.yskw != null ) links.yskw.addLink( this, YSkw, c );
+			if ( links.rot != null ) links.rot.addLink( this, Rot, c );
+			if ( links.xpiv != null ) links.xpiv.addLink( this, XPiv, c );
+			if ( links.ypiv != null ) links.ypiv.addLink( this, YPiv, c );
+		}
+		if ( links.color != null ) {
+			addParentColorLinks( links.color, c );
+		} else {
+			if ( links.red != null ) links.red.addLink( this, Red, c );
+			if ( links.green != null ) links.green.addLink( this, Green, c );
+			if ( links.blue != null ) links.blue.addLink( this, Blue, c );
+			if ( links.alpha != null ) links.alpha.addLink( this, Alpha, c );
+		}
 		if ( links.visible != null ) links.visible.addVisibleLink( this );
 	}
 
