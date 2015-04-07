@@ -19,14 +19,14 @@ class Batch {
 
 	public var namedWidgets(default,null) = new Map<String,Widget>();
 	public var renderList(default,null) = new Array<Float>();
-	public var buttonList(default,null) = new Array<Widget>();
+	public var pointableList(default,null) = new Array<Widget>();
 	public var atlas(default,null): Atlas;	
 	public var altered(default,null) = true;
 	public var centerX(default,null): Float = 0;
 	public var centerY(default,null): Float = 0;
 	public var count(default,null): Int = 0;
 	public var renderer(default,null): BatchRenderer;
-	public var allowInvisibleButtons: Bool = false;
+	public var allowInvisiblePointables: Bool = false;
 
 	public function setCenter( x: Float, y: Float ) {
 		for ( id in 0...count ) {
@@ -60,8 +60,8 @@ class Batch {
 			new Widget( this, shift, args );
 		}
 
-		if ( wgt.isButton() ) {
-			buttonList.push( wgt );
+		if ( wgt.isPointable() ) {
+			pointableList.push( wgt );
 		}
 
 		if ( args != null && args.name != null ) {
@@ -135,24 +135,42 @@ class Batch {
 		altered = false;
 	}
 
-	public inline function getButtonsAt( x: Float, y: Float ) {
+	public inline function getPointablesAt( x: Float, y: Float ) {
 		// TODO: Spatial optimizations
-		return buttonList;
+		return pointableList;
 	}
 
-	public inline function onPress( x: Float, y: Float ) {
-		for ( w in getButtonsAt( x, y )) {
+	public inline static var MOVE = 1;
+	public inline static var UP = MOVE << 1;
+	public inline static var DOWN = UP << 1;
+	public inline static var CANCEL = DOWN << 1;
+	public inline static var LEFT = CANCEL << 1;
+	public inline static var RIGHT = LEFT << 1;
+	public inline static var MIDDLE = RIGHT << 1;
+	public inline static var WHEEL_UP = MIDDLE << 1;
+	public inline static var WHEEL_DOWN = WHEEL_UP << 1;
+	public inline static var TOUCH_1 = WHEEL_DOWN << 1;
+	public inline static var TOUCH_2 = TOUCH_1 << 1;
+	public inline static var TOUCH_3 = TOUCH_2 << 1;
+	public inline static var TOUCH_4 = TOUCH_3 << 1;
+	public inline static var TOUCH_5 = TOUCH_4 << 1;
+	public inline static var TOUCH_6 = TOUCH_5 << 1;
+	public inline static var TOUCH_7 = TOUCH_6 << 1;
+	public inline static var TOUCH_8 = TOUCH_7 << 1;
+	public inline static var TOUCH_9 = TOUCH_8 << 1;
+	public inline static var TOUCH_10 = TOUCH_9 << 1;
+	
+	public inline function onPointer( x: Float, y: Float, msg: Int ) {
+		for ( w in getPointablesAt( x, y )) {
 			if ( w.pointInside( x, y )) {
-				if ( w.visible || allowInvisibleButtons ) {
-					w.press();
-					if ( w.block ) {
+				if ( w.visible || allowInvisiblePointables ) {
+					if (!w.onPointer( w, x, y, msg )) {
 						break;
 					}
 				}
 			}
 		}
 	}
-
 	public var glyphsCache(default,null) = new Map<String, Array<Float>>();
 	public var mappingsCache(default,null) = new Map<String, Map<Int,Float>>();
 	

@@ -42,10 +42,9 @@ typedef WidgetConfig = {
 	?alpha: Float,
 	?xpiv: Float,
 	?ypiv: Float,
-	?toggle: Bool,
 	?visible: Bool,
 	?hit: Array<Float>,
-	?block: Bool,
+	?hitFromFrame: Int,
 	?onPress: Widget->Void,
 	?onRelease: Widget->Void,
 	?onStop: Widget->Void,
@@ -90,7 +89,7 @@ class Widget implements Tween.Tweenable {
 	var attrAdd = new Vector<Float>( N_ATTR );
 
 	public var frameIdx(default,null): Float = 0;
-	var framesList: Array<Float> = null;
+	public var framesList(default,null): Array<Float> = null;
 	var links = { 
 		var links = new Vector<Array<WidgetLink>>( N_ATTR );
 		for ( i in 0...N_ATTR ) links[i] = new Array<WidgetLink>();
@@ -102,19 +101,9 @@ class Widget implements Tween.Tweenable {
 
 	public inline static var Invisible: Int = 1 << 0;
 	public inline static var InvisibleAdd: Int = 1 << 1;
-	public inline static var Block: Int = 1 << 2;
+	public inline static var NotPointable: Int = 1 << 2;
 	public inline static var NotCentred: Int = 1 << 3;
-	public inline static var Disabled: Int = 1 << 4;
-	public inline static var Rotated: Int = 1 << 5;
-
-	public inline static var Active = 0;
-	public inline static var Press = 1;
-	public inline static var Disable = 2;
-
-	public inline static var LAST_FRAME = -1;
-	public inline static var DEFAULT_FPS = 24.;
-
-	public static var pressDelay(default,default) = 300;
+	public inline static var Rotated: Int = 1 << 4;
 
 	public var flags(default,null): Int = 0;
 	public var x(get,set): Float;
@@ -132,18 +121,14 @@ class Widget implements Tween.Tweenable {
 	public var xpiv(get,set): Float;
 	public var ypiv(get,set): Float;
 
-	public var toggle(default,null): Bool = false;
 	public var hit(default,null): Array<Float> = null;
 
-	public var block(get,set): Bool;
-	public var disabled(get,set): Bool;
-	public var enabled(get,set): Bool;
 	public var visible(get,set): Bool;
+	public var pointable(get,set): Bool;
 
-	static function doNothing( self: Widget ): Void {} 
+	static function doNothing( self: Widget, x: Float, y: Float, msg: Int ): Bool { return true; } 
 
-	public var onPress: Widget->Void = doNothing;
-	public var onRelease: Widget->Void = doNothing;
+	public var onPointer: Widget->Float->Float->Int->Bool = doNothing;
 
 	var visibleLink: Array<Widget>;
 
@@ -167,9 +152,7 @@ class Widget implements Tween.Tweenable {
 	public inline function get_ypiv() return getAttr( YPiv );
 	public inline function get_lastFrame() return framesList.length - 1;
 	public inline function get_visible() return !testFlag( Invisible );
-	public inline function get_disabled() return testFlag( Disabled );
-	public inline function get_enabled() return !get_disabled();
-	public inline function get_block() return testFlag( Block );
+	public inline function get_pointable() return !testFlag( NotPointable );
 
 	public inline function set_x(v) { attr[X] = v; updateX(); updateLink( X ); return v; }
 	public inline function set_y(v) { attr[Y] = v; updateY(); updateLink( Y ); return v; }
@@ -185,19 +168,12 @@ class Widget implements Tween.Tweenable {
 	public inline function set_alpha(v) { attr[Alpha] = v; batch.setA( shift, v + attrAdd[Alpha] );return v; }
 	public inline function set_xpiv(v) { attr[XPiv] = v; updateCentred(); if (testFlag( NotCentred )) updatePivot(); updateLink( XPiv ); return v; }
 	public inline function set_ypiv(v) { attr[YPiv] = v; updateCentred(); if (testFlag( NotCentred )) updatePivot(); updateLink( YPiv ); return v; }
-	public inline function set_disabled( disabled: Bool ) {
-		if ( disabled ) setFlag( Disabled ) else unsetFlag( Disabled );
-		frame = disabled ? Disable : Active ; 
-		return disabled; }
-	public inline function set_enabled( enabled: Bool ) return set_disabled( !enabled );
 	public inline function set_visible( visible: Bool ) { 
 		if ( visible ) unsetFlag( Invisible ) else setFlag( Invisible );
 		updateFrame(); 
 		updateVisibleLink(); 
 		return visible; }
-	public inline function set_block( block: Bool ) { 
-		if ( block ) setFlag( Block ) else unsetFlag( Block ); 
-		return block; }
+	public inline function set_pointable(v) {unsetFlag( NotPointable ); return v;} 
 
 	public var batch(default,null): Batch;
 	
@@ -403,7 +379,7 @@ class Widget implements Tween.Tweenable {
 		}
 	}
 
-	inline function updateSingleVisibleLink( i: Int ) {
+	function updateSingleVisibleLink( i: Int ) {
 		if ( testFlag( Invisible )) visibleLink[i].setFlag( InvisibleAdd ) else visibleLink[i].unsetFlag( InvisibleAdd );
 		visibleLink[i].updateFrame();
 		visibleLink[i].updateVisibleLink();
@@ -417,7 +393,8 @@ class Widget implements Tween.Tweenable {
 		}
 	}
 	
-	public inline function isButton() return onPress != doNothing || onRelease != doNothing;
+	public inline function isPointable() return !testFlag( NotPointable ) && hit != null;
+	//public inline function isButton() return onPointer != doNothing;
 
 	public inline function setPos( x: Float, y: Float ) { set_x( x ); set_y( y );}
 	public inline function setRGB( r: Float, g: Float, b: Float ) { set_red( r ); set_green( g ); set_blue( b ); }
@@ -475,35 +452,7 @@ class Widget implements Tween.Tweenable {
 		framesList = l;
 		frame = 0;
 	}
-
-	function tryRelease( t: Timer ) if ( !disabled ) release();
-
-	public function press() {
-		if ( framesList != null && framesList.length > 1 && !disabled ) {
-			if( !toggle ) {
-				if ( frame != Press ) {
-					frame = Press;
-					onPress( this );
-					Timer.dcall( tryRelease, 0.3, 0 );
-				}
-			} else {
-				if ( frame == Press ) {
-					release();
-				} else {
-					frame = Press;
-					onPress( this );
-				}
-			}
-		}
-	}
-
-	public inline function release() {
-		if ( !disabled && frame != Active ) {
-			frame = Active;
-			onRelease( this );
-		}
-	}
-
+	
 	public inline function addParentTransformLinks( parent: Widget, c: Bool ) {
 		parent.addLink( this, X, c );
 		parent.addLink( this, Y, c );
@@ -585,21 +534,13 @@ class Widget implements Tween.Tweenable {
 
 		updateAll();
 		
-		if ( args.onPress != null || args.onRelease != null ) {
-			if ( args.hit != null ) {
-				hit = args.hit;
-			} else {
-				var f = framesList.length > 0 ? Std.int( framesList[0] ) : 0;
-				var w = batch.atlas.rects[f].width; 
-				var h = batch.atlas.rects[f].height;
-				hit = [-0.5*w,-0.5*h,0.5*w,0.5*h];
-			}
-
-			toggle = args.toggle != null ? args.toggle : false;
-			block = args.block != null ? args.block : false;
-			
-			onPress = args.onPress != null ? args.onPress : doNothing;	
-			onRelease = args.onRelease != null ? args.onRelease : doNothing;	
+		if ( args.hit != null ) {
+			hit = args.hit;
+		} else if ( args.hitFromFrame != null ) {
+			var f = framesList.length > args.hitFromFrame ? Std.int( framesList[args.hitFromFrame] ) : 0;
+			var w = batch.atlas.rects[f].width; 
+			var h = batch.atlas.rects[f].height;
+			hit = [-0.5*w,-0.5*h,0.5*w,0.5*h];
 		}
 
 		if ( args.parent != null ) {
