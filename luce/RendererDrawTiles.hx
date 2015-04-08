@@ -13,6 +13,9 @@ class RendererDrawTiles implements Batch.BatchRenderer {
 	}
 
 	public inline function render( batch: Batch ) {
-		batch.atlas.tilesheet.drawTiles( graphics, batch.renderList, smooth, RENDER_FLAGS );
+#if !renderer_no_clear 
+		graphics.clear(); 
+#end
+		batch.atlas.tilesheet.drawTiles( graphics, batch.renderList, smooth #if !batch_minimal ,RENDER_FLAGS #end );
 	}	
 }

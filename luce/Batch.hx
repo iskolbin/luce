@@ -15,7 +15,7 @@ interface BatchRenderer {
 }
 
 class Batch {
-	public static inline var WGT_SIZE = 11;
+	public static inline var WGT_SIZE = #if batch_minimal 3 #else 11 #end;
 
 	public var namedWidgets(default,null) = new Map<String,Widget>();
 	public var renderList(default,null) = new Array<Float>();
@@ -110,18 +110,19 @@ class Batch {
 	public inline function setA( shift: Int, v: Float )  { setRList( shift, 10, v); }
 
 	inline function setRList( shift, idx: Int, v: Float ) {
-#if batch_no_altered_test
-		renderList[shift+idx] = v;
-#else
-	#if batch_no_changed_test
+#if batch_minimal
+		if ( idx >= 3 ) return;
+#end
+#if batch_no_changed_test
 		renderList[shift+idx] = v; 
+	#if !batch_no_altered_test
 		altered = true;
-	#else
+	#end
+#else
 		if ( renderList[shift+idx] != v ) {
 			renderList[shift+idx] = v;
 			altered = true;
 		}
-	#end
 #end
 	}
 
