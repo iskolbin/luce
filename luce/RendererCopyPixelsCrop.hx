@@ -33,7 +33,7 @@ class RendererCopyPixelsCrop implements Batch.BatchRenderer {
 					p.x = batch.getCX( shift ) - c.x;
 					p.y = batch.getCY( shift ) - c.y;
 
-					buffer.copyPixels( batch.atlas.bitmapData, rect, p, null, zeroPoint, true);							}													
+					buffer.copyPixels( batch.atlas.bitmapData, rect, p, null, zeroPoint, true);							
 				}
 			}
 			shift += Batch.WGT_SIZE;

@@ -15,7 +15,11 @@ interface BatchRenderer {
 }
 
 class Batch {
-	public static inline var WGT_SIZE = #if batch_minimal 3 #else 11 #end;
+#if batch_minimal
+	public static inline var WGT_SIZE = 3
+#else 
+	public static inline var WGT_SIZE = 11 
+#end;
 
 	public var namedWidgets(default,null) = new Map<String,Widget>();
 	public var renderList(default,null) = new Array<Float>();
