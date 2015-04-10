@@ -65,8 +65,9 @@ private class WidgetLink {
 }
 
 class Widget implements Tween.Tweenable {
-	static var NULL_FRAMES:Array<Float> = [0];
-	static var NULL_ARGS:WidgetConfig = {};
+	public static var NULL_FRAMES(default,null): Array<Float> = [0];
+	public static var NULL_ARGS(default,null): WidgetConfig = {};
+	public static var NULL_STRINGS(default,null): Array<String> = [];
 
 	public inline static var X: Int = 0;
 	public inline static var Y: Int = 1;
@@ -525,7 +526,7 @@ class Widget implements Tween.Tweenable {
 		}
 
 		if ( args.frames != null ) {
-			framesList = batch.newFramesList( args.frames );
+			framesList = args.frames != NULL_STRINGS ? batch.newFramesList( args.frames ) : NULL_FRAMES;
 		} else if ( args.framesList != null ) {
 			framesList = args.framesList;
 		} else {
