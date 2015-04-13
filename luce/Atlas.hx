@@ -1,6 +1,5 @@
 package luce;
 
-import openfl.Assets;
 import openfl.display.Tilesheet;
 import openfl.display.BitmapData;
 import openfl.geom.Rectangle;
@@ -112,8 +111,8 @@ class Atlas {
 		addFrame( filename, frameData.x, frameData.y, frameData.w, frameData.h, cx, cy );
 	}
 
-	public static function fromTexturePackerJsonHash( data: TexturePackerJsonHash, imagePath: String, ?xscl, ?yscl ) {
-		var self = new Atlas( imagePath, xscl, yscl );
+	public static function fromTexturePackerJsonHash( data: TexturePackerJsonHash, bitmapData: BitmapData, ?xscl, ?yscl ) {
+		var self = new Atlas( bitmapData, xscl, yscl );
 		
 		for ( filename in Reflect.fields( data.frames )  ) {
 			self.addTexturePackerFrame( Reflect.field( data.frames, filename ), filename );
@@ -121,8 +120,8 @@ class Atlas {
 		return self;
 	}
 
-	public static function fromTexturePackerJsonArray( data: TexturePackerJsonArray, imagePath: String, ?xscl, ?yscl ) {
-		var self = new Atlas( imagePath, xscl, yscl );		
+	public static function fromTexturePackerJsonArray( data: TexturePackerJsonArray, bitmapData: BitmapData, ?xscl, ?yscl ) {
+		var self = new Atlas( bitmapData, xscl, yscl );		
 		
 		for ( frame in data.frames ) {
 		 	self.addTexturePackerFrame( frame );
@@ -131,23 +130,20 @@ class Atlas {
 		return self;
 	}
 
-
 	function scaleBitmapData( bitmapData: BitmapData, xscl: Float, yscl: Float ) {
 		var matrix = new openfl.geom.Matrix(xscl, 0,0,yscl, 0, 0);
-		//matrix.scale( xscl, yscl );
-
 		var newBitmapData = new BitmapData( Std.int(bitmapData.width * xscl), Std.int(bitmapData.height * yscl), true, 0x000000);
 		newBitmapData.draw( bitmapData, matrix, null, null, null, true );
 		return newBitmapData;
 	}
 
-	function new( atlasImagePath: String, ?xscl, ?yscl ) {
-		bitmapData = Assets.getBitmapData( atlasImagePath );
+	function new( bitmapData: BitmapData, ?xscl, ?yscl ) {
+		this.bitmapData = bitmapData;
 		if ( xscl != null || yscl != null ) {
 			this.xscl = xscl != null ? xscl : 1.0;
 			this.yscl = yscl != null ? yscl : 1.0;
 			if ( this.xscl != 1.0 || this.yscl != 1.0 ) {
-	//			bitmapData = scaleBitmapData( bitmapData, this.xscl, this.yscl );
+				bitmapData = scaleBitmapData( bitmapData, this.xscl, this.yscl );
 			}
 		}
 		
