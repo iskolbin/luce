@@ -197,8 +197,10 @@ class Widget implements Tween.Tweenable {
 	inline function updateCentred() if ( sum( XPiv ) == 0.0 && sum( YPiv ) == 0.0 ) unsetFlag( NotCentred ) else setFlag( NotCentred );
 
 	inline function updatePivot() {
-		batch.setX( shift, sum(X) + sum(XPiv)*batch.getTA( shift ) + sum(YPiv)*batch.getTB( shift ) - sum(XPiv));
-		batch.setY( shift, sum(Y) + sum(XPiv)*batch.getTC( shift ) + sum(YPiv)*batch.getTD( shift ) - sum(YPiv));
+		var xp = sum(XPiv);
+		var yp = sum(YPiv);
+		batch.setX( shift, sum(X) - xp*batch.getTA( shift ) - yp*batch.getTC( shift ) + xp);
+		batch.setY( shift, sum(Y) - xp*batch.getTB( shift ) - yp*batch.getTD( shift ) + yp);
 	}
 
 	inline function updateX() {
@@ -395,12 +397,12 @@ class Widget implements Tween.Tweenable {
 	}
 	
 	public inline function isPointable() return !testFlag( NotPointable ) && hit != null;
-	//public inline function isButton() return onPointer != doNothing;
 
 	public inline function setPos( x: Float, y: Float ) { set_x( x ); set_y( y );}
 	public inline function setRGB( r: Float, g: Float, b: Float ) { set_red( r ); set_green( g ); set_blue( b ); }
 	public inline function setPiv( x: Float, y: Float ) { set_xpiv( x ); set_ypiv( y );}
-
+	public inline function setPivTo( w: Widget ) setPiv( w.x - x, w.y - y );
+	
 	public inline function setScl( x: Float, y: Float ) { attr[XScl] = x; attr[YScl] = y; updateTransform();}
 	public inline function setSclByFrameWidth( w: Float ) { attr[XScl] = w/getFrameWidth(); updateTransform(); }
 	public inline function setSclByFrameHeight( h: Float ) { attr[YScl] = h/getFrameHeight(); updateTransform(); }
@@ -500,10 +502,7 @@ class Widget implements Tween.Tweenable {
 		if ( links.visible != null ) links.visible.addVisibleLink( this );
 	}
 
-	public function new( batch: Batch, shift: Int, ?args: WidgetConfig ) {
-		args = args != null ? args : NULL_ARGS;
-		this.batch = batch;
-		this.shift = shift; 
+	inline function init( args: WidgetConfig ) {
 		attr[X] = args.x != null ? args.x : 0;
 		attr[Y] = args.y != null ? args.y : 0;
 		attr[Frame] = args.frame != null ? args.frame : 0;
@@ -547,5 +546,11 @@ class Widget implements Tween.Tweenable {
 		if ( args.parent != null ) {
 			addParentLinks( args.parent );
 		}
+	}
+
+	public function new( batch: Batch, shift: Int, ?args: WidgetConfig ) {
+		this.batch = batch;
+		this.shift = shift; 
+		init( args != null ? args: NULL_ARGS );
 	}
 }
