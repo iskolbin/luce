@@ -51,15 +51,17 @@ typedef WidgetConfig = {
 	?frames: Array<String>,
 	?framesList: Array<Float>,
 	?parent: LinksStruct,
+	?pivTo: Widget,
 	?text: Text.TextConfig,
 	?grid: Grid.GridConfig,
 }
 
 class Widget implements Tween.Tweenable {
 	public static var NULL_FRAMES(default,null): Array<Float> = [0.0];
-	public static var NULL_ARGS(default,null): WidgetConfig = {};
 	public static var NULL_STRINGS(default,null) = new Array<String>();
-
+	public static function onPointerDoNothing( self: Widget, x: Float, y: Float, msg: Int ): Bool { return true; } 
+	
+	// Attributes
 	public inline static var X: Int = 0;
 	public inline static var Y: Int = 1;
 	public inline static var Frame: Int = 2;
@@ -74,105 +76,108 @@ class Widget implements Tween.Tweenable {
 	public inline static var Alpha: Int = 11;
 	public inline static var XPiv: Int = 12;
 	public inline static var YPiv: Int = 13;
+	public inline static var Visible: Int = 14; // only for parent/children
 
 	public inline static var N_ATTR: Int = 14;
 
-	var attr = new Vector<Float>( N_ATTR );
-	var attrAdd = new Vector<Float>( N_ATTR );
-
+	// Data fields
+	public var attr(default,null) = new Vector<Float>( N_ATTR ); 
+	public var attrWld(default,null) = new Vector<Float>( N_ATTR ); 
 	public var frameIdx(default,null): Float = 0;
-	public var framesList(default,null): Array<Float> = null;
-	public var parent(default,null) = new Vector<Widget>( N_ATTR );
+	public var framesList(default,null): Array<Float> = NULL_FRAMES;
+	public var parent(default,null) = new Vector<Widget>( N_ATTR+1 );
 	public var children(default,null) = new Array<Widget>();
-	var sin_: Float = 0;
-	var cos_: Float = 0;
-	var shift: Int;
-
-	public inline static var Invisible: Int = 1 << 0;
-	public inline static var InvisibleAdd: Int = 1 << 1;
-	public inline static var NotPointable: Int = 1 << 2;
-	public inline static var NotCentred: Int = 1 << 3;
-	public inline static var Rotated: Int = 1 << 4;
-
 	public var flags(default,null): Int = 0;
-	public var x(get,set): Float;
-	public var y(get,set): Float;
-	public var frame(get,set): Float;
-	public var xscl(get,set): Float;
-	public var yscl(get,set): Float;
-	public var xskw(get,set): Float;
-	public var yskw(get,set): Float;
-	public var rot(get,set): Float;
-	public var red(get,set): Float;
-	public var green(get,set): Float;
-	public var blue(get,set): Float;
-	public var alpha(get,set): Float;
-	public var xpiv(get,set): Float;
-	public var ypiv(get,set): Float;
-
 	public var hit(default,null): Array<Float> = null;
+	public var sin_(default,null): Float = 0;
+	public var cos_(default,null): Float = 0;
+	public var shift(default,null): Int;
+	public var batch(default,null): Batch;
+	public var onPointer: Widget->Float->Float->Int->Bool = onPointerDoNothing;
+	
+	// Flags
+	public inline static var Invisible: Int = 1 << 0;
+	public inline static var NotPointable: Int = 1 << 1;
+	public inline static var NotCentred: Int = 1 << 2;
+	public inline static var Rotated: Int = 1 << 3;
 
-	public var visible(get,set): Bool;
-	public var pointable(get,set): Bool;
-
-	static function doNothing( self: Widget, x: Float, y: Float, msg: Int ): Bool { return true; } 
-
-	public var onPointer: Widget->Float->Float->Int->Bool = doNothing;
-
-	var visibleLink: Array<Widget>;
+	// Localt getters
+	public inline function getAttr( attr: Int )    return this.attr[attr];
+	
+	public var x(get,set): Float;					public inline function get_x() return getAttr( X );
+	public var y(get,set): Float;         public inline function get_y() return getAttr( Y );
+	public var frame(get,set): Float;     public inline function get_frame() return getAttr( Frame );
+	public var xscl(get,set): Float;      public inline function get_xscl() return getAttr( XScl );
+	public var yscl(get,set): Float;      public inline function get_yscl() return getAttr( YScl );
+	public var xskw(get,set): Float;      public inline function get_xskw() return getAttr( XSkw );
+	public var yskw(get,set): Float;      public inline function get_yskw() return getAttr( YSkw );
+	public var rot(get,set): Float;       public inline function get_rot() return getAttr( Rot );
+	public var red(get,set): Float;       public inline function get_red() return getAttr( Red );
+	public var green(get,set): Float;     public inline function get_green() return getAttr( Green )
+	public var blue(get,set): Float;      public inline function get_blue() return getAttr( Blue );
+	public var alpha(get,set): Float;     public inline function get_alpha() return getAttr( Alpha )
+	public var xpiv(get,set): Float;      public inline function get_xpiv() return getAttr( XPiv );
+	public var ypiv(get,set): Float;      public inline function get_ypiv() return getAttr( YPiv );
+	public var visible(get,set): Bool;    public inline function get_visible() return !testFlag( Invisible );
+	
+	// World getters
+	public inline function getAttrWld( attr: Int ) return this.attrWld[attr];
+	
+	public var xWld(get,null): Float;     public inline function get_xWld() return getAttrWld( X );
+	public var yWld(get,null): Float;     public inline function get_yWld() return getAttrWld( Y );
+	public var frameWld(get,null): Float; public inline function get_frameWld() return getAttrWld( Frame );
+	public var xsclWld(get,null): Float;  public inline function get_xsclWld() return getAttrWld( XScl );
+	public var ysclWld(get,null): Float;  public inline function get_ysclWld() return getAttrWld( YScl );
+	public var xskwWld(get,null): Float;  public inline function get_xskwWld() return getAttrWld( XSkw );
+	public var yskwWld(get,null): Float;  public inline function get_yskwWld() return getAttrWld( YSkw );
+	public var rotWld(get,null): Float;   public inline function get_rotWld() return getAttrWld( Rot );
+	public var redWld(get,null): Float;   public inline function get_redWld() return getAttrWld( Red );
+	public var greenWld(get,null): Float; public inline function get_greenWld() return getAttrWld( Green );
+	public var blueWld(get,null): Float;  public inline function get_blueWld() return getAttrWld( Blue );
+	public var alphaWld(get,null): Float; public inline function get_alphaWld() return getAttrWld( Alpha );
+	public var xpivWld(get,null): Float;  public inline function get_xpivWld() return getAttrWld( XPiv );
+	public var ypivWld(get,null): Float;  public inline function get_ypivWld() return getAttrWld( YPiv );
+	public var visibleWld(get,null):Bool; public inline function get_visibleWld() return !testFlag( Invisible ) && ( !parent[Visible] || !parent[Visible].testFlag( Invisible ));
+	
+	public var pointable(get,set): Bool;  public inline function get_pointable() return hit != null && !testFlag( NotPointable );
 
 	inline function testFlag( flag: Int ) return ( flags & flag ) != 0;
 	inline function unsetFlag( flag: Int ) flags &= ~flag;
 	inline function setFlag( flag: Int ) flags |= flag; 
-
-	public inline function get_x() return getAttr( X );
-	public inline function get_y() return getAttr( Y );
-	public inline function get_frame() return getAttr( Frame );
-	public inline function get_xscl() return getAttr( XScl );
-	public inline function get_yscl() return getAttr( YScl );
-	public inline function get_xskw() return getAttr( XSkw );
-	public inline function get_yskw() return getAttr( YSkw );
-	public inline function get_rot() return getAttr( Rot );
-	public inline function get_red() return getAttr( Red );
-	public inline function get_green() return getAttr( Green );
-	public inline function get_blue() return getAttr( Blue );
-	public inline function get_alpha() return getAttr( Alpha );
-	public inline function get_xpiv() return getAttr( XPiv );
-	public inline function get_ypiv() return getAttr( YPiv );
+	
 	public inline function get_lastFrame() return framesList.length - 1;
-	public inline function get_visible() return !testFlag( Invisible );
-	public inline function get_pointable() return !testFlag( NotPointable );
-
-	public inline function set_x(v) { attr[X] = v; updateX(); updateLink( X ); return v; }
-	public inline function set_y(v) { attr[Y] = v; updateY(); updateLink( Y ); return v; }
-	public inline function set_frame(v) { attr[Frame] = v; updateFrame(); updateLink( Frame ); return v; }
-	public inline function set_xscl(v) { attr[XScl] = v; updateXScl(); updateLink( XScl ); return v; }
-	public inline function set_yscl(v) { attr[YScl] = v; updateYScl(); updateLink( YScl ); return v; }
-	public inline function set_xskw(v) { attr[XSkw] = v; updateXSkw(); updateLink( XSkw ); return v; }
-	public inline function set_yskw(v) { attr[YSkw] = v; updateYSkw(); updateLink( YSkw ); return v; }
-	public inline function set_rot(v) { attr[Rot] = v; updateRot(); updateLink( Rot ); return v; }
-	public inline function set_red(v) { attr[Red] = v; batch.setR( shift, v + attrAdd[Red] ); updateLink( Red ); return v; }
-	public inline function set_green(v) { attr[Green] = v; batch.setG( shift, v + attrAdd[Green] ); updateLink( Green ); return v; }
-	public inline function set_blue(v) { attr[Blue] = v; batch.setB( shift, v + attrAdd[Blue] ); updateLink( Blue ); return v; }
-	public inline function set_alpha(v) { attr[Alpha] = v; batch.setA( shift, v + attrAdd[Alpha] );return v; }
-	public inline function set_xpiv(v) { attr[XPiv] = v; updateCentred(); if (testFlag( NotCentred )) updatePivot(); updateLink( XPiv ); return v; }
-	public inline function set_ypiv(v) { attr[YPiv] = v; updateCentred(); if (testFlag( NotCentred )) updatePivot(); updateLink( YPiv ); return v; }
+	
+	// Setters
+	public inline function set_x(v)     { attr[X] = v; updateX(); updateChildren( X ); return v; }
+	public inline function set_y(v)     { attr[Y] = v; updateY(); updateChildren( Y ); return v; }
+	public inline function set_frame(v) { attr[Frame] = v; updateFrame(); updateChildren( Frame ); return v; }
+	public inline function set_xscl(v)  { attr[XScl] = v; updateXScl(); updateChildren( XScl ); return v; }
+	public inline function set_yscl(v)  { attr[YScl] = v; updateYScl(); updateChildren( YScl ); return v; }
+	public inline function set_xskw(v)  { attr[XSkw] = v; updateXSkw(); updateChildren( XSkw ); return v; }
+	public inline function set_yskw(v)  { attr[YSkw] = v; updateYSkw(); updateChildren( YSkw ); return v; }
+	public inline function set_rot(v)   { attr[Rot] = v; updateRot(); updateChildren( Rot ); return v; }
+	public inline function set_red(v)   { attr[Red] = v; updateRed(); updateChildren( Red ); return v; }
+	public inline function set_green(v) { attr[Green] = v; updateGreen(); updateChildren( Green ); return v; }
+	public inline function set_blue(v)  { attr[Blue] = v; updateBlue(); updateChildren( Blue ); return v; }
+	public inline function set_alpha(v) { attr[Alpha] = v; updateAlpha(); updateChildren( Alpha ); return v; }
+	public inline function set_xpiv(v)  { attr[XPiv] = v; updateCentred(); updateChildren( XPiv ); return v; }
+	public inline function set_ypiv(v)  { attr[YPiv] = v; updateCentred(); updateChildren( YPiv ); return v; }
+	
 	public inline function set_visible( visible: Bool ) { 
 		if ( visible ) unsetFlag( Invisible ) else setFlag( Invisible );
 		updateFrame(); 
-		updateVisibleLink(); 
-		return visible; }
-	public inline function set_pointable(v) {unsetFlag( NotPointable ); return v;} 
+		updateChildren( Visible ); 
+		return visible; 
+	}
 
-	public var batch(default,null): Batch;
-	
-	public inline function getAttr( attr: Int ) return this.attr[attr];
-	inline function sum( attr: Int ) return this.attr[attr] + this.attrAdd[attr];
-	public inline function getAttrWorld( attr: Int ) return sum( attr );
+	public inline function set_pointable( v: Bool ) {
+		if ( v ) unsetFlag( NotPointable ) else setFlag( NotPointable ); 
+		return v;
+	} 
 
 	public inline function pointInside( xp: Float, yp: Float ) {
-		var wx = sum( X );
-		var wy = sum( Y );
+		var wx = xWld;
+		var wy = yWld;
 		return xp >= wx + hit[0] && yp >= wy + hit[1] && xp <= wx+hit[2] && yp <= wy+hit[3]; 
 	}
 
@@ -182,20 +187,27 @@ class Widget implements Tween.Tweenable {
 		updateChildren( attr );
 	}
 
-	inline function updateCentred() if ( sum( XPiv ) == 0.0 && sum( YPiv ) == 0.0 ) unsetFlag( NotCentred ) else setFlag( NotCentred );
+	inline function updateCentred() {
+		if ( xpivWld == 0.0 && ypivWld == 0.0 ) {
+			unsetFlag( NotCentred );
+			batch.setX( shift, xWld );
+			batch.setY( shift, yWld );
+		}	else {
+			setFlag( NotCentred );
+			updatePivot();
+		}
+	}
 
 	inline function updatePivot() {
-		var xp = sum(XPiv);
-		var yp = sum(YPiv);
-		batch.setX( shift, sum(X) - xp*batch.getTA( shift ) - yp*batch.getTC( shift ) + xp);
-		batch.setY( shift, sum(Y) - xp*batch.getTB( shift ) - yp*batch.getTD( shift ) + yp);
+		batch.setX( shift, xWld - xpivWld*batch.getTA( shift ) - ypivWld*batch.getTC( shift ) + xpivWld);
+		batch.setY( shift, yWld - xpivWld*batch.getTB( shift ) - ypivWld*batch.getTD( shift ) + ypivWld);
 	}
 
 	inline function updateX() {
 		if ( testFlag( NotCentred )) {
 			updatePivot();
 		} else {
-			batch.setX( shift, sum(X));
+			batch.setX( shift, xWld );
 		}
 	}
 
@@ -203,16 +215,16 @@ class Widget implements Tween.Tweenable {
 		if ( testFlag( NotCentred )) {
 			updatePivot();
 		} else {
-			batch.setY( shift, sum(Y));
+			batch.setY( shift, yWld );
 		}
 	}
 
 	inline function updateXScl() {
 		if ( testFlag( Rotated )) {
-			batch.setTA( shift, cos_ * sum(XScl) - sin_ * sum(YSkw) );
-			batch.setTB( shift, sin_ * sum(XScl) + cos_ * sum(YSkw) );
+			batch.setTA( shift, cos_ * xsclWld - sin_ * yskwWld );
+			batch.setTB( shift, sin_ * xsclWld + cos_ * yskwWld );
 		} else {
-			batch.setTA( shift, sum(XScl) );
+			batch.setTA( shift, xsclWld );
 		}
 		if ( testFlag( NotCentred )) {
 			updatePivot();
@@ -221,10 +233,10 @@ class Widget implements Tween.Tweenable {
 
 	inline function updateYScl() {
 		if ( testFlag( Rotated )) {
-			batch.setTC( shift, cos_ * sum(XSkw) - sin_ * sum(YScl) );
-			batch.setTD( shift, sin_ * sum(XSkw) + cos_ * sum(YScl) );
+			batch.setTC( shift, cos_ * xskwWld - sin_ * ysclWld );
+			batch.setTD( shift, sin_ * xskwWld + cos_ * ysclWld );
 		} else {
-			batch.setTD( shift, sum(YScl) );
+			batch.setTD( shift, ysclWld );
 		}
 		if ( testFlag( NotCentred ) ) {
 			updatePivot();
@@ -233,10 +245,10 @@ class Widget implements Tween.Tweenable {
 
 	inline function updateXSkw() {
 		if ( testFlag( Rotated )) {
-			batch.setTC( shift, cos_ * sum(XSkw) - sin_ * sum(YScl) );
-			batch.setTD( shift, sin_ * sum(XSkw) + cos_ * sum(YScl) );
+			batch.setTC( shift, cos_ * xskwWld - sin_ * ysclWld );
+			batch.setTD( shift, sin_ * xskwWld + cos_ * ysclWld );
 		} else {
-			batch.setTC( shift, sum(XSkw) );
+			batch.setTC( shift, xskwWld );
 		}
 		if ( testFlag( NotCentred )) {
 			updatePivot();
@@ -245,10 +257,10 @@ class Widget implements Tween.Tweenable {
 	
 	inline function updateYSkw() {
 		if ( testFlag( Rotated )) {
-			batch.setTA( shift, cos_ * sum(XScl) - sin_ * sum(YSkw) );
-			batch.setTB( shift, sin_ * sum(XScl) + cos_ * sum(YSkw) );
+			batch.setTA( shift, cos_ * xsclWld - sin_ * yskwWld );
+			batch.setTB( shift, sin_ * xsclWld + cos_ * yskwWld );
 		} else {
-			batch.setTB( shift, sum(YSkw) );
+			batch.setTB( shift, yskwWld );
 		}
 		if ( testFlag( NotCentred )) {
 			updatePivot();
@@ -257,15 +269,15 @@ class Widget implements Tween.Tweenable {
 
 	inline function updateTransform() {
 		if ( testFlag( Rotated )) {
-			batch.setTA( shift, cos_ * sum(XScl) - sin_ * sum(YSkw) );
-			batch.setTC( shift, cos_ * sum(XSkw) - sin_ * sum(YScl) );
-			batch.setTB( shift, sin_ * sum(XScl) + cos_ * sum(YSkw) );
-			batch.setTD( shift, sin_ * sum(XSkw) + cos_ * sum(YScl) );
+			batch.setTA( shift, cos_ * xsclWld - sin_ * yskwWld );
+			batch.setTC( shift, cos_ * xskwWld - sin_ * ysclWld );
+			batch.setTB( shift, sin_ * xsclWld + cos_ * yskwWld );
+			batch.setTD( shift, sin_ * xskwWld + cos_ * ysclWld );
 		} else {
-			batch.setTA( shift, sum(XScl) );
-			batch.setTC( shift, sum(XSkw) );
-			batch.setTB( shift, sum(YSkw) );
-			batch.setTD( shift, sum(YScl) );
+			batch.setTA( shift, xsclWld );
+			batch.setTC( shift, xskwWld );
+			batch.setTB( shift, yskwWld );
+			batch.setTD( shift, ysclWld );
 		}
 		if ( testFlag( NotCentred )) {
 			updatePivot();
@@ -274,7 +286,7 @@ class Widget implements Tween.Tweenable {
 	
 	inline function updateRot() {
 		// TODO: Lookup math
-		var rot_ = sum(Rot);
+		var rot_ = rotWld;
 		if ( rot_ != 0.0 ) {
 			sin_ = Math.sin( rot_ );
 			cos_ = Math.cos( rot_ );
@@ -289,37 +301,44 @@ class Widget implements Tween.Tweenable {
 
 
 	inline function updateFrame() {
-		frameIdx = (!testFlag( Invisible ) && !testFlag( InvisibleAdd )) ? framesList[Std.int( attr[Frame] + attrAdd[Frame] )] : Atlas.NULL; 
+		frameIdx = visibleWld ? framesList[Std.int( frameWld )] : Atlas.NULL; 
 		batch.setFrame( shift, frameIdx ); 
 	}
+
+	inline function updateRed()   batch.setR( shift, redWld );
+	inline function updateGreen() batch.setG( shift, greenWld );
+	inline function updateBlue()  batch.setB( shift, blueWld );
+	inline function updateAlpha() batch.setA( shift, alphaWld );
 	
+	inline function updateColor() { 
+		updateRed();
+		updateGreen();
+		updateBlue();
+		updateAlpha();
+	}
+
 	inline function updateAttr( attr_: Int ) {
 		switch( attr_ ) {
 			case X: updateX(); 
 			case Y: updateY();
-			case Red: batch.setR( shift, sum(Red) );
-			case Green: batch.setG( shift, sum(Green) );
-			case Blue: batch.setB( shift, sum(Blue) );
-			case Alpha: batch.setA( shift, sum(Alpha) );
+			case Red: updateRed();
+			case Green: updateGreen();
+			case Blue: updateBlue();
+			case Alpha: updateAlpha();
 			case XScl: updateXScl();
 			case YScl: updateYScl();
 			case XSkw: updateXSkw();
 			case YSkw: updateYSkw();
 			case Rot: updateRot();
-			case Frame: updateFrame();		
+			case Frame, Visible: updateFrame();		
 			case XPiv, YPiv: updateCentred(); if ( testFlag( NotCentred )) updatePivot();
 		}
 	}
 	
 	function updateAll() {
-		batch.setR( shift, sum(Red)	);
-		batch.setG( shift, sum(Green) );
-		batch.setB( shift, sum(Blue) );
-		batch.setA( shift, sum(Alpha) );
-	
+		updateColor();	
 		updateCentred();	
 		updateRot();
-		updatePivot();
 		updateFrame();
 	}
 
@@ -337,45 +356,32 @@ class Widget implements Tween.Tweenable {
 		if ( child.parent[attr] != null ) {
 			parent.removeChild( child, attr, centrify );
 		}
-
-		var attrSum = sum( attr );
-		if ( centrify == true ) {
-			child.attr[attr] -= attrSum;
-		}
-		child.addAttr[attr] = attrSum;
 		children.push( child );
 		child.parent[attr] = this;
+		if ( attr != Visible ) {
+			if ( centrify == true ) {
+				child.attr[attr] -= this.attrWld[attr];
+			}
+			child.attrWld[attr] = child.attr[attr] + this.attrWld[attr];
+		}
+		
 		child.updateAttr( attr );
 		child.updateChildren( attr );
 	}
 
-	public function addVisibleLink( child: Widget ) {
-		if ( visibleLink == null ) {
-			visibleLink = new Array<Widget>();
-		}
-		visibleLink.push( child );
-		updateSingleVisibleLink( visibleLink.length-1 );
-	}
-
-	public function removeVisibleLink( child: Widget ) {
-		if ( visibleLink != null ) {
-			var idx = visibleLink.indexOf( child );
-			if ( idx >= 0 ) {
-				visibleLink.splice( idx, 1 );
-			}
-		}
-	}
-
 	public function removeChild( child: Widget, attr: Int, ?centrify: Bool ) {
-		for ( i in 0...children.length ) {
-			var currentChild = children[i];
-			if ( currentChild == child && child.parent[attr] == this ) {
-				if ( centrify == true ) {
-					child.addAttr[attr] = 
+		var i = children.indexOf( child );
+		if ( i >= 0 ) {
+			var child = children[i];
+			if ( child.parent[attr] = this ) {
+				if ( attr != Visible ) {
+					if ( centrify == true ) {
+						child.attr[attr] += this.attrWld[attr];
+					}
+					child.attrWld[attr] = child.attr[attr];
 				}
 				child.parent[attr] = null;
-				children.splice( i, 1 );
-				break;
+				child.splice( i, 1 );
 			}
 		}
 	}
@@ -384,27 +390,13 @@ class Widget implements Tween.Tweenable {
 		for ( i in 0...children.length ) {
 			var child = children[i];
 			if ( child.parent[attr] == this ) {
-				child.attrAdd[attr] = sum( attr );
+				child.attrWld[attr] = child.attr[attr] + this.attrWld[attr];
 				child.updateAttr( attr );
 				child.updateChildren( attr );
 			}
 		}
 	}
 
-	function updateSingleVisibleLink( i: Int ) {
-		if ( testFlag( Invisible )) visibleLink[i].setFlag( InvisibleAdd ) else visibleLink[i].unsetFlag( InvisibleAdd );
-		visibleLink[i].updateFrame();
-		visibleLink[i].updateVisibleLink();
-	}
-
-	public function updateVisibleLink() {
-		if ( visibleLink != null ) {
-			for ( i in 0...visibleLink.length ) {
-				updateSingleVisibleLink( i );
-			}
-		}
-	}
-	
 	public inline function isPointable() return !testFlag( NotPointable ) && hit != null;
 
 	public inline function setPos( x: Float, y: Float ) { set_x( x ); set_y( y );}
@@ -424,37 +416,42 @@ class Widget implements Tween.Tweenable {
 
 	public inline function setTransform( xscl: Float, yskw: Float, xskw: Float, yscl: Float ) { 
 		attr[XScl] = xscl; attr[YSkw] = yskw; attr[XSkw] = xskw; attr[YScl] = yscl; 
-		updateTransform();}
+		updateTransform();
+	}
 	
 	public inline function setIdentityTransform() { 
 		attr[XScl] = 1; attr[YSkw] = 0; attr[XSkw] = 0; attr[YScl] = 1; 
-		updateTransform();}
+		updateTransform();
+	}
 	
 	public inline function applyTransform( a: Float, b: Float, c: Float, d: Float ) { 
 		var xscl = attr[XScl]; var yskw = attr[YSkw]; var xskw = attr[XSkw]; var yscl = attr[YScl];
 		attr[XScl] = xscl*a + yskw*c; attr[YSkw] = xscl*b + yskw*d; attr[XSkw] = xskw*a + yscl*c; attr[YScl] = xskw*b + yscl*d; 
-		updateTransform();}
+		updateTransform();
+	}
 	
 	public inline function applyReflection( lx: Float, ly: Float ) {
 		var lx2 = lx*lx; var ly2 = ly*ly; var d = 1.0 / (lx2 + ly2);
 		var lxly = 2*lx*ly*d; var lx2_ly2 = (lx2 - ly2)*d;
-		applyTransform( lx2_ly2, lxly, lxly, -lx2_ly2 );}
+		applyTransform( lx2_ly2, lxly, lxly, -lx2_ly2 );
+	}
 	
 	public inline function applyOrthProjection( ux: Float, uy: Float ) {
 		var ux2 = ux*ux; var uy2 = uy*uy;
 		var d = 1.0 / (ux2 + uy2); var uxuy = 2*ux*uy*d;
-		applyTransform( ux2*d, uxuy, uxuy, uy2*d );}
+		applyTransform( ux2*d, uxuy, uxuy, uy2*d );
+	}
 
 	public inline function setNextFrame() { attr[Frame] = (attr[Frame]+1) % framesList.length; updateFrame(); }
 	public inline function setPrevFrame() { attr[Frame] = (attr[Frame]-1) % framesList.length; updateFrame(); }
-	public inline function setFirstFrame() { attr[Frame] = 0; updateFrame(); }
+	public inline function setFirstFrame(){ attr[Frame] = 0; updateFrame(); }
 	public inline function setLastFrame() { attr[Frame] = framesList.length - 1; updateFrame(); }
 	public inline function getLastFrame() return framesList.length-1;
 
-	public inline function getFrameWidth() return batch.atlas.rects[Std.int(frameIdx)].width;
-	public inline function getFrameHeight() return batch.atlas.rects[Std.int(frameIdx)].height;
-	public inline function getActualFrameWidth() return batch.atlas.rects[Std.int(framesList[Std.int(sum(Frame))])].width;
-	public inline function getActualFrameHeight() return batch.atlas.rects[Std.int(framesList[Std.int(sum(Frame))])].height;
+	public inline function getFrameWidth()  return batch.atlas.rects[Std.int( frameIdx )].width;
+	public inline function getFrameHeight() return batch.atlas.rects[Std.int( frameIdx )].height;
+	public inline function getActualFrameWidth()  return batch.atlas.rects[Std.int( framesList[Std.int( frameWld )] )].width;
+	public inline function getActualFrameHeight() return batch.atlas.rects[Std.int( framesList[Std.int( frameWld )] )].height;
    
 	public inline function move ( attr: Int, target: Float, length: Float, ease: Int, after: Int ) { return Tween.move( this, attr, target, length, ease, after ); }
 	public inline function move2( attr: Int, pairsList: Array<Float>, ease: Int, after: Int ) { return Tween.move2( this, attr, pairsList, ease, after ); }
@@ -508,7 +505,7 @@ class Widget implements Tween.Tweenable {
 			if ( links.blue != null ) setParent( links.blue, Blue, c );
 			if ( links.alpha != null ) setParent( links.alpha, Alpha, c );
 		}
-		if ( links.visible != null ) links.visible.addVisibleLink( this );
+		if ( links.visible != null ) setParent( links.visible, Visible, c );
 	}
 
 	inline function init( args: WidgetConfig ) {
@@ -526,21 +523,17 @@ class Widget implements Tween.Tweenable {
 		attr[Alpha] = args.alpha != null ? args.alpha : 1;
 		attr[XPiv]  = args.xpiv != null ? args.xpiv : 0;
 		attr[YPiv]  = args.ypiv != null ? args.ypiv : 0;
-			
-		for ( i in 0...N_ATTR ) attrAdd[i] = 0;
 
 		if ( args.visible == false ) {
 			setFlag( Invisible );
 		}
 
-		if ( args.frames != null ) {
-			framesList = args.frames != NULL_STRINGS ? batch.newFramesList( args.frames ) : NULL_FRAMES;
+		if ( args.frames != null && args.frames != NULL_STRINGS  ) {
+			framesList = batch.newFramesList( args.frames );
 		} else if ( args.framesList != null ) {
 			framesList = args.framesList;
-		} else {
-			framesList = NULL_FRAMES;
-		}
-
+		} 
+		
 		updateAll();
 		
 		if ( args.hit != null ) {
@@ -555,11 +548,20 @@ class Widget implements Tween.Tweenable {
 		if ( args.parent != null ) {
 			addParentLinks( args.parent );
 		}
+
+		if ( args.pivTo != null ) {
+			setPivTo( args.pivTo );
+		}
 	}
 
 	public function new( batch: Batch, shift: Int, ?args: WidgetConfig ) {
 		this.batch = batch;
-		this.shift = shift; 
-		init( args != null ? args: NULL_ARGS );
+		this.shift = shift;
+		for ( i in 0...N_ATTR ) {
+			attrWld[i] = attr[i];
+		}
+	 	if ( args != null ) {	
+			init( args );
+		}
 	}
 }
