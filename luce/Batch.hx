@@ -134,7 +134,6 @@ class Batch {
 #if !batch_no_altered_test
 		if ( !altered ) return;
 #end
-
 		renderer.render( this );
 
 		altered = false;

@@ -95,10 +95,10 @@ class Text extends Widget {
 		}
 	}
 
-	override function updateVisibleLink() {
-		super.updateVisibleLink();
-		updateGlyphs();
-	}
+//	override function updateVisibleLink() {
+//		super.updateVisibleLink();
+//		updateGlyphs();
+//	}
 
 	inline function getGlyphWidth( i: Int ) return switch( codes[i] ) {
 		case NONE: 0;
