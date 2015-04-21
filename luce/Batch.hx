@@ -135,7 +135,6 @@ class Batch {
 		if ( !altered ) return;
 #end
 		renderer.render( this );
-
 		altered = false;
 	}
 
