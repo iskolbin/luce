@@ -4,6 +4,7 @@ import openfl.display.Tilesheet;
 import openfl.display.BitmapData;
 import openfl.geom.Rectangle;
 import openfl.geom.Point;
+import de.polygonal.Printf;
 
 typedef TexturePackerJsonFrame = {
 	?filename: String,
@@ -30,9 +31,13 @@ class Atlas {
 	public var tilesheet(default,null): Tilesheet;
 	public var bitmapData(default,null): BitmapData;
 	public var ids9patch(default,null) = new Map<String, Array<Float>>();
-	var xscl = 1.0;
-	var yscl = 1.0;
-
+	public var xscl(default,null) = 1.0;
+	public var yscl(default,null) = 1.0;
+	public var framesCache(default,null) = new Map<String, Array<Float>>();
+	public var glyphsCache(default,null) = new Map<String, Array<Float>>();
+	public var mappingsCache(default,null) = new Map<String, Map<Int,Float>>();
+	public static var noSpecialMapping = new Map<String,String>();
+	public static var specialSymbols: Map<String,String> = ["." => "dot", "," => "comma", "\\" => "backslash", "/" => "slash", "&" => "ampersand"];
 	public static inline var NULL: Float = 0;
 
 	var count: Int = 0;
@@ -130,6 +135,32 @@ class Atlas {
 		return self;
 	}
 
+	public function framesFromStrings( frames: Array<String> ): Array<Float> {
+		return [ for ( f in frames ) ids[f] ];
+	}
+
+	public function cacheFrames( name: String, frames: Array<String> ) {
+		framesCache[name] = framesFromStrings( frames );	
+	}
+
+	public function cacheGlyphs( name: String, path: String, chars: String, ?specialSymbolsMapping: Map<String,String> ) {
+		var ssmap = specialSymbolsMapping != null ? specialSymbolsMapping : specialSymbols;
+		var s = [""];
+		var framesList = new Array<Float>();
+		var mapping  = new Map<Int,Float>();
+		for ( i in 0...chars.length ) {
+			var c = chars.charAt( i );
+			var c_ = specialSymbols[c];
+			s[0] = c_ != null ? c_ : c;
+			var id = ids[Printf.format( path, s )]; 
+			mapping[chars.charCodeAt( i )] = framesList.length;
+			framesList.push( id );
+		}
+
+		glyphsCache[name] = framesList; 
+		mappingsCache[name] = mapping;
+	}
+	
 	function scaleBitmapData( bitmapData: BitmapData, xscl: Float, yscl: Float ) {
 		var matrix = new openfl.geom.Matrix(xscl, 0,0,yscl, 0, 0);
 		var newBitmapData = new BitmapData( Std.int(bitmapData.width * xscl), Std.int(bitmapData.height * yscl), true, 0x000000);

@@ -13,7 +13,10 @@ typedef PropConfig = {
 	?green: Float,
 	?blue: Float,
 	?alpha: Float,
+	?image: String,
 	?frame: Float,
+	?frames: Array<String>,
+	?cachedFrames: String,
 	?props: Array<PropConfig>,
 }
 
@@ -21,10 +24,10 @@ class Scene {
 	public static inline var RenderX     = 0;
 	public static inline var RenderY     = 1;
 	public static inline var RenderFrame = 2;
-	public static inline var RenderTA  = 3;
-	public static inline var RenderTB  = 4;
-	public static inline var RenderTC  = 5;
-	public static inline var RenderTD  = 6;
+	public static inline var RenderTA    = 3;
+	public static inline var RenderTB    = 4;
+	public static inline var RenderTC    = 5;
+	public static inline var RenderTD    = 6;
 	public static inline var RenderRed   = 7;
 	public static inline var RenderGreen = 8;
 	public static inline var RenderBlue  = 9;
@@ -58,18 +61,22 @@ class Scene {
 	public static inline var TransformLevel = 3;
 	public static inline var TransformShift = 4;
 	public static inline var RenderShift = 5;
-	public static inline var LINKS_N2 = 3; // 2^3=8
+	public static inline var AUX_POW2 = 3; // 2^3=8
 
 	public var propsCount: Int = 0;
 
-	public var linksList     = new Array<Int>();
+	public var auxList     = new Array<Int>();
 	public var renderList    = new Array<Float>();
 	public var transformList = new Array<Array<Float>>();
 	public var id2name       = new Map<Int,String>();
 	public var name2id       = new Map<String,Int>();
 
-	public function new( props: Array<PropConfig> ) {
-		addProp( {props: props}, 0, NULL_PARENT );
+	public var atlas: Atlas;
+	public var altred: Bool = true;
+
+	public function new( atlas: Atlas, root: PropConfig ) {
+		this.atlas = atlas;
+		addProp( root, 0, NULL_PARENT );
 	}
 
 	public inline function sin( x: Float ) return Math.sin( x );
@@ -77,20 +84,16 @@ class Scene {
 
 	public inline function byName( name: String ) return name2id[name];
 	public inline function toName( id: Int ) return id2name[id];
+	
 	public inline function getTransform( id: Int ): Array<Float> {
 		var shift = _link( id, TransformShift );
 		var t = transformList[_link( id, TransformLevel )];
-		return [t[shift],t[shift+1],t[shift+2],t[shift+3],t[shift+4],
-			t[shift+5],t[shift+6],t[shift+7],t[shift+8],t[shift+9],
-			t[shift+10],t[shift+11],t[shift+12],t[shift+13],t[shift+14],
-			t[shift+15],t[shift+16]];
+		return [ for ( i in 0...ATTR_N ) t[shift+i]];
 	}
 
 	public inline function getRenderAttrs( id: Int ): Array<Float> {
 		var shift = _link( id, RenderShift );
-		var r = renderList;
-		return [r[shift],r[shift+1],r[shift+2],r[shift+3],r[shift+4],
-			r[shift+5],r[shift+6],r[shift+7],r[shift+8],r[shift+9],r[shift+10]];
+		return [ for ( i in 0...RENDER_N ) renderList[shift+i]];
 	}
 
 	public function addProp( args: PropConfig, level: Int, parent: Int ) {	
@@ -105,15 +108,15 @@ class Scene {
 
 		for ( i in 0...ATTR_N ) transformList[level].push( 0.0 );
 		for ( i in 0...RENDER_N ) renderList.push( 0.0 );
-		for ( i in 0...(1<<LINKS_N2) ) linksList.push( 0 );
+		for ( i in 0...(1<<AUX_POW2) ) auxList.push( 0 );
 
-		var id_ = id<<LINKS_N2;
-		linksList[id_ + Parent] = parent;
-		linksList[id_ + ChildrenShift] = transformShift;
-		linksList[id_ + ChildrenCount] = args.props != null ? args.props.length : 0;
-		linksList[id_ + TransformLevel] = level;
-		linksList[id_ + TransformShift] = transformShift;
-		linksList[id_ + RenderShift] = renderShift;
+		var id_ = id<<AUX_POW2;
+		auxList[id_ + Parent] = parent;
+		auxList[id_ + ChildrenShift] = transformShift;
+		auxList[id_ + ChildrenCount] = args.props != null ? args.props.length : 0;
+		auxList[id_ + TransformLevel] = level;
+		auxList[id_ + TransformShift] = transformShift;
+		auxList[id_ + RenderShift] = renderShift;
 
 		_setTransform( id, 
 				args.x != null ? args.x : 0, args.y != null ? args.y : 0,
@@ -124,8 +127,9 @@ class Scene {
 				args.red != null ? args.red : 1, args.green != null ? args.green : 1, 
 				args.blue != null ? args.blue : 1, args.alpha != null ? args.alpha : 1 );
 		_setFrame( id, 
-				args.frame != null ? args.frame : 0 );
-	
+				args.image != null ? atlas.ids[args.image] : 0 );
+		
+
 		if ( args.name != null ) {
 			id2name[id] = args.name;
 			name2id[args.name] = id;
@@ -139,11 +143,11 @@ class Scene {
 	}
 
 	inline function _link( id: Int, attr: Int ): Int {
-		return linksList[(id<<LINKS_N2) + attr];
+		return auxList[(id<<AUX_POW2) + attr];
 	}
 
 	inline function _setFrame( id: Int, frame: Float ) {
-		renderList[_link( id, RenderFrame )] = frame;	
+		renderList[_link( id, RenderShift )+RenderFrame] = frame;	
 	}
 	
 	inline function _setTransform( id: Int, x: Float, y: Float, xscl: Float, yskw: Float, xskw: Float, yscl: Float, rot: Float ) {
@@ -217,7 +221,7 @@ class Scene {
 		t[shift + Alpha] = alpha;
 		
 		if ( parentId != NULL_PARENT ) {
-			var prshift = linksList[parentId + RenderShift];			
+			var prshift = auxList[parentId + RenderShift];			
 			r[rshift + RenderRed]   = r[prshift+RenderRed] * t[shift+Red];
 			r[rshift + RenderGreen] = r[prshift+RenderGreen] * t[shift+Green];
 			r[rshift + RenderBlue]  = r[prshift+RenderBlue] * t[shift+Blue];
