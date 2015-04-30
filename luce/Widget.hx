@@ -45,9 +45,10 @@ typedef WidgetConfig = {
 	?visible: Bool,
 	?hit: Array<Float>,
 	?hitFromFrame: Int,
-	?onPress: Widget->Void,
-	?onRelease: Widget->Void,
-	?onStop: Widget->Void,
+	//?onPress: Widget->Void,
+	//?onRelease: Widget->Void,
+	//?onStop: Widget->Void,
+	?onPointer: Widget->Float->Float->Int->Bool,
 	?frames: Array<String>,
 	?framesList: Array<Float>,
 	?parent: LinksStruct,
@@ -570,6 +571,7 @@ class Widget implements Tween.Tweenable {
 			hit = [-0.5*w,-0.5*h,0.5*w,0.5*h];
 		}
 
+		if ( args.onPointer != null ) onPointer = args.onPointer;
 		if ( args.parent != null ) addParentLinks( args.parent );
 		if ( args.pivTo != null )  setPivTo( args.pivTo );
 	
