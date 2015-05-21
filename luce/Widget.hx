@@ -23,7 +23,6 @@ private typedef LinksStruct = {
 	?xpiv: Widget,
 	?ypiv: Widget,
 	?visible: Widget,
-	?centrify: Bool,
 }
 
 typedef WidgetConfig = {
@@ -45,9 +44,6 @@ typedef WidgetConfig = {
 	?visible: Bool,
 	?hit: Array<Float>,
 	?hitFromFrame: Int,
-	//?onPress: Widget->Void,
-	//?onRelease: Widget->Void,
-	//?onStop: Widget->Void,
 	?onPointer: Widget->Float->Float->Int->Bool,
 	?frames: Array<String>,
 	?framesList: Array<Float>,
@@ -338,56 +334,34 @@ class Widget implements Tween.Tweenable {
 	inline function updateAlpha()  { updateWldAttrMul( Alpha ); batch.setA( shift, alphaWld ); }
 	inline function updateVisible() { updateWldAttrMul( Visible ); _updateFrameVisible(); }
 
-	static var chstck = new Vector<Int>( 256 );
-	
 	function updateAttr( attr_: Int ) {
+		// TODO: remove recursion
 		var w = this;
 		var chsidx: Int = 0;
 		
-		//do {
-			switch( attr_ ) {
-				case X: w.updateX(); 
-				case Y: w.updateY();
-				case Red: w.updateRed();
-				case Green: w.updateGreen();
-				case Blue: w.updateBlue();
-				case Alpha: w.updateAlpha();
-				case XScl: w.updateXScl();
-				case YScl: w.updateYScl();
-				case XSkw: w.updateXSkw();
-				case YSkw: w.updateYSkw();
-				case Rot: w.updateRot();
-				case Frame: w.updateFrame();		
-				case XPiv: w.updateXPiv();
-				case YPiv: w.updateYPiv();
-				case Visible: w.updateVisible();
-			}
+		switch( attr_ ) {
+			case X: w.updateX(); 
+			case Y: w.updateY();
+			case Red: w.updateRed();
+			case Green: w.updateGreen();
+			case Blue: w.updateBlue();
+			case Alpha: w.updateAlpha();
+			case XScl: w.updateXScl();
+			case YScl: w.updateYScl();
+			case XSkw: w.updateXSkw();
+			case YSkw: w.updateYSkw();
+			case Rot: w.updateRot();
+			case Frame: w.updateFrame();		
+			case XPiv: w.updateXPiv();
+			case YPiv: w.updateYPiv();
+			case Visible: w.updateVisible();
+		}
 			
 		if ( children[attr_] != null ) {
 			for ( c in children[attr_] ) {
 				c.updateAttr( attr_ );
 			}
 		}
-			
-	/*		var cs = w.children[attr_];
-			if ( cs == null ) {
-				while ( chsidx > 0 && ( cs == null || chstck[chsidx] <= 0 )) {
-					w = w.parent[attr_];
-					chsidx -= 1;
-				}	
-				if ( chstck[chsidx] > 0 ) {
-					chstck[chsidx] -= 1;
-					w = w.children[chstck[chsidx]];
-					chsidx += 1;
-				}
-			} else {
-				chstck[chsidx] = cs.length;
-				chstck[chsidx] -= 1;
-				w = w.chidren[chstck[chsidx]];
-				chsidx += 1;
-			}
-		} while ( chsidx >= 0 );
-		//updateChildren( attr_ ); */
 	}
 	
 	function updateAll() {
@@ -401,20 +375,20 @@ class Widget implements Tween.Tweenable {
 		updateFrame();
 	}
 
-	public function setParent( parent: Widget, attr: Int, ?centrify: Bool ) {
+	public function setParent( parent: Widget, attr: Int ) {
 		if ( parent != null ) {
-			parent.addChild( this, attr, centrify );
+			parent.addChild( this, attr );
 		} else {
 			if ( this.parent[attr] != null ) {
-				this.parent[attr].removeChild( this, attr, centrify );
+				this.parent[attr].removeChild( this, attr );
 			}
 		}
 	}
 
-	public function addChild( child: Widget, attr: Int, ?centrify: Bool ) {
+	public function addChild( child: Widget, attr: Int ) {
 		if ( child.parent[attr] != this ) {
 			if ( child.parent[attr] != null ) {
-				child.parent[attr].removeChild( child, attr, centrify );
+				child.parent[attr].removeChild( child, attr );
 			}
 			if ( children[attr] == null ) {
 				children[attr] = new Array<Widget>();
@@ -425,7 +399,7 @@ class Widget implements Tween.Tweenable {
 		}
 	}
 
-	public function removeChild( child: Widget, attr: Int, ?centrify: Bool ) {
+	public function removeChild( child: Widget, attr: Int ) {
 		if ( children[attr] != null ) {
 			var i = children[attr].indexOf( child );
 			if ( i >= 0 ) {
@@ -493,50 +467,49 @@ class Widget implements Tween.Tweenable {
 	public inline function move2( attr: Int, pairsList: Array<Float>, ease: Int, after: Int ) return Tween.move2( this, attr, pairsList, ease, after ); 
 	public inline function move3( attr: Int, pairsList: Array<Float>, after: Int ) return Tween.move3( this, attr, pairsList, after ); 
 
-	public function addParentTransformLinks( parent: Widget, c: Bool ) {
-		setParent( parent, X, c );
-		setParent( parent, Y, c );
-		setParent( parent, XScl, c );
-		setParent( parent, YScl, c );
-		setParent( parent, XSkw, c );
-		setParent( parent, YSkw, c );
-		setParent( parent, Rot, c );
-		setParent( parent, XPiv, c );
-		setParent( parent, YPiv, c );
+	public function addParentTransformLinks( parent: Widget ) {
+		setParent( parent, X );
+		setParent( parent, Y );
+		setParent( parent, XScl );
+		setParent( parent, YScl );
+		setParent( parent, XSkw );
+		setParent( parent, YSkw );
+		setParent( parent, Rot );
+		setParent( parent, XPiv );
+		setParent( parent, YPiv );
 	}
 
-	public function addParentColorLinks( parent: Widget, c: Bool ) {
-		setParent( parent, Red, c );
-		setParent( parent, Green, c );
-		setParent( parent, Blue, c );
-		setParent( parent, Alpha, c );
+	public function addParentColorLinks( parent: Widget ) {
+		setParent( parent, Red );
+		setParent( parent, Green );
+		setParent( parent, Blue );
+		setParent( parent, Alpha );
 	}
 
 	public function addParentLinks( links: LinksStruct ) {
-		var c = links.centrify == true;
-		if ( links.frame != null ) links.frame.addChild( this, Frame, c );
+		if ( links.frame != null ) links.frame.addChild( this, Frame );
 		if ( links.transform != null ) {
-			addParentTransformLinks( links.transform, c );
+			addParentTransformLinks( links.transform );
 		} else {
-			if ( links.x != null ) setParent( links.x, X, c );
-			if ( links.y != null ) setParent( links.y, Y, c );
-			if ( links.xscl != null ) setParent( links.xscl, XScl, c );
-			if ( links.yscl != null ) setParent( links.yscl, YScl, c );
-			if ( links.xskw != null ) setParent( links.xskw, XSkw, c );
-			if ( links.yskw != null ) setParent( links.yskw, YSkw, c );
-			if ( links.rot != null ) setParent( links.rot, Rot, c );
-			if ( links.xpiv != null ) setParent( links.xpiv, XPiv, c );
-			if ( links.ypiv != null ) setParent( links.ypiv, YPiv, c );
+			if ( links.x != null ) setParent( links.x, X );
+			if ( links.y != null ) setParent( links.y, Y );
+			if ( links.xscl != null ) setParent( links.xscl, XScl );
+			if ( links.yscl != null ) setParent( links.yscl, YScl );
+			if ( links.xskw != null ) setParent( links.xskw, XSkw );
+			if ( links.yskw != null ) setParent( links.yskw, YSkw );
+			if ( links.rot != null ) setParent( links.rot, Rot );
+			if ( links.xpiv != null ) setParent( links.xpiv, XPiv );
+			if ( links.ypiv != null ) setParent( links.ypiv, YPiv );
 		}
 		if ( links.color != null ) {
-			addParentColorLinks( links.color, c );
+			addParentColorLinks( links.color );
 		} else {
-			if ( links.red != null ) setParent( links.red, Red, c );
-			if ( links.green != null ) setParent( links.green, Green, c );
-			if ( links.blue != null ) setParent( links.blue, Blue, c );
-			if ( links.alpha != null ) setParent( links.alpha, Alpha, c );
+			if ( links.red != null ) setParent( links.red, Red );
+			if ( links.green != null ) setParent( links.green, Green );
+			if ( links.blue != null ) setParent( links.blue, Blue );
+			if ( links.alpha != null ) setParent( links.alpha, Alpha );
 		}
-		if ( links.visible != null ) setParent( links.visible, Visible, c );
+		if ( links.visible != null ) setParent( links.visible, Visible );
 	}
 
 	inline function init( args: WidgetConfig ) {
