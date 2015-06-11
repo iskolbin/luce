@@ -14,6 +14,7 @@ typedef TextConfig = {
 	count: Int,
 	?tracking: Float,
 	?spaceWidth: Float,
+	?squeeze: Bool,
 }
 
 class Text extends Widget {
@@ -33,9 +34,11 @@ class Text extends Widget {
 	public var tracking(default,set): Float = 0;
 	public var totalWidth(get,null): Float;
 	public var spaceWidth(default,set): Float = 0;
+	public var squeeze(default,set): Bool = true;
 
 	public inline function set_tracking(v) { tracking = v; updateGlyphs(); return v; }
 	public inline function set_spaceWidth(v) { spaceWidth = v; updateGlyphs(); return v; }
+	public inline function set_squeeze(v) { squeeze = v; updateGlyphs(); return v; }
 
 	public inline function get_totalWidth() {
 		var w = length > 0 ? -tracking : 0.;
@@ -54,6 +57,7 @@ class Text extends Widget {
 		align = args.align != null ? args.align : Center;
 		mapping = args.mapping;
 		if ( args.tracking != null ) tracking = args.tracking;
+		if ( args.squeeze != null ) squeeze = args.squeeze;
 
 		var x_ = x;
 		var y_ = y;
@@ -103,7 +107,7 @@ class Text extends Widget {
 	inline function getGlyphWidth( i: Int ) return switch( codes[i] ) {
 		case NONE: 0;
 		case SPACE: spaceWidth;
-		default: glyphs[i].getActualFrameWidth();
+		default: squeeze ? glyphs[i].getActualFrameWidth() : glyphs[i].getFrameSourceWidth();
 	}
 
 	function updateGlyphs() {

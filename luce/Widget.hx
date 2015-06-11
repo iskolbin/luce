@@ -461,8 +461,10 @@ class Widget implements Tween.Tweenable {
 	public inline function getFrameWidth()  return batch.atlas.rects[Std.int( frameIdx )].width;
 	public inline function getFrameHeight() return batch.atlas.rects[Std.int( frameIdx )].height;
 	public inline function getActualFrameWidth()  return batch.atlas.rects[Std.int( framesList[Std.int( frameWld )] )].width;
-	public inline function getActualFrameHeight() return batch.atlas.rects[Std.int( framesList[Std.int( frameWld )] )].height;
-   
+	public inline function getActualFrameHeight() return batch.atlas.rects[Std.int( framesList[Std.int( frameWld )] )].height; 
+	public inline function getFrameSourceWidth()  return batch.atlas.sourceWidth[Std.int( framesList[Std.int( frameWld )] )];
+	public inline function getFrameSourceHeight() return batch.atlas.sourceHeight[Std.int( framesList[Std.int( frameWld )] )];
+	
 	public inline function move ( attr: Int, target: Float, length: Float, ease: Int, after: Int ) return Tween.move( this, attr, target, length, ease, after ); 
 	public inline function move2( attr: Int, pairsList: Array<Float>, ease: Int, after: Int ) return Tween.move2( this, attr, pairsList, ease, after ); 
 	public inline function move3( attr: Int, pairsList: Array<Float>, after: Int ) return Tween.move3( this, attr, pairsList, after ); 
