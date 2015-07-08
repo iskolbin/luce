@@ -96,6 +96,8 @@ class Text extends Widget {
 			setCodes( args.codes );
 		} else if ( args.string != null ) {
 			setString( args.string );
+		} else {
+			setString( "" );
 		}
 	}
 
