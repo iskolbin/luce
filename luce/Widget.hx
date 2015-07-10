@@ -1,7 +1,7 @@
 package luce;
 
-import luce.utils.Timer;
-import luce.utils.Tween;
+import junge.Timer;
+import junge.Tween;
 
 import haxe.ds.Vector;
 

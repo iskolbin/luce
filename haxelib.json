@@ -8,7 +8,7 @@
 	"releasenote": "Initial release.",
 	"contributors": ["iskolbin"],
 	"dependencies": {
-		"luce-utils": "",
+		"junge": "",
 		"openfl": "",
 		"polygonal-printf": "",
 	}
