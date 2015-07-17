@@ -201,7 +201,7 @@ class Batch {
 	}
 
 	public function newFramesList( frames: Array<String> ): Array<Float> {
-		return [ for ( f in frames )  atlas.ids[f] ];
+		return [ for ( f in frames )  (atlas.ids[f] != null ? atlas.ids[f] : Atlas.NULL) ];
 	}
 
 	public inline function byName( name: String ) {
