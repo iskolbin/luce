@@ -11,19 +11,19 @@ typedef TextConfig = {
 	?cached: String,
 	?codes: Array<Int>,
 	?string: String,
-	count: Int,
 	?tracking: Float,
 	?spaceWidth: Float,
 	?squeeze: Bool,
+	count: Int,
 }
 
 class Text extends Widget {
-	public static inline var Center: Int = 0;
-	public static inline var Left: Int = 1;
-	public static inline var Right: Int = 2;
+	static public inline var Center: Int = 0;
+	static public inline var Left: Int = 1;
+	static public inline var Right: Int = 2;
 
-	public static inline var NONE: Int = -0xfff;
-	public static inline var SPACE: Int = -0xffe;
+	static public inline var NONE: Int = -0xfff;
+	static public inline var SPACE: Int = -0xffe;
 
 	public var length(default,null): Int = 0;
 	public var glyphs(default,null): Vector<Widget>;
@@ -100,11 +100,6 @@ class Text extends Widget {
 			setString( "" );
 		}
 	}
-
-//	override function updateVisibleLink() {
-//		super.updateVisibleLink();
-//		updateGlyphs();
-//	}
 
 	inline function getGlyphWidth( i: Int ) return switch( codes[i] ) {
 		case NONE: 0;

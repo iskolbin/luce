@@ -54,9 +54,9 @@ typedef WidgetConfig = {
 }
 
 class Widget implements Tween.Tweenable {
-	public static var NULL_FRAMES(default,null): Array<Float> = [0.0];
-	public static var NULL_STRINGS(default,null) = new Array<String>();
-	public static function onPointerDoNothing( self: Widget, x: Float, y: Float, msg: Int ): Bool { return true; } 
+	static public var NULL_FRAMES(default,null): Array<Float> = [0.0];
+	static public var NULL_STRINGS(default,null) = new Array<String>();
+	static public function onPointerDoNothing( self: Widget, x: Float, y: Float, msg: Int ): Bool { return true; } 
 	
 	// Attributes
 	public inline static var X:       Int = 0;

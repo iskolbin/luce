@@ -38,9 +38,9 @@ class Atlas {
 	public var framesCache(default,null) = new Map<String, Array<Float>>();
 	public var glyphsCache(default,null) = new Map<String, Array<Float>>();
 	public var mappingsCache(default,null) = new Map<String, Map<Int,Float>>();
-	public static var noSpecialMapping = new Map<String,String>();
-	public static var specialSymbols: Map<String,String> = ["." => "dot", "," => "comma", "\\" => "backslash", "/" => "slash", "&" => "ampersand"];
-	public static inline var NULL: Float = 0;
+//	static public var noSpecialMapping = new Map<String,String>();
+//	static public var specialSymbols: Map<String,String> = ["." => "dot", "," => "comma", "\\" => "backslash", "/" => "slash", "&" => "ampersand"];
+	static public inline var NULL: Float = 0;
 
 	var count: Int = 0;
 
@@ -70,7 +70,7 @@ class Atlas {
 		addFrame( filename, frameData.x, frameData.y, frameData.w, frameData.h, cx, cy, frame.sourceSize.w, frame.sourceSize.h );
 	}
 
-	public static function fromTexturePackerJsonHash( data: TexturePackerJsonHash, bitmapData: BitmapData, ?xscl, ?yscl ) {
+	static public function fromTexturePackerJsonHash( data: TexturePackerJsonHash, bitmapData: BitmapData, ?xscl, ?yscl ) {
 		var self = new Atlas( bitmapData, xscl, yscl );
 		
 		for ( filename in Reflect.fields( data.frames )  ) {
@@ -79,7 +79,7 @@ class Atlas {
 		return self;
 	}
 
-	public static function fromTexturePackerJsonArray( data: TexturePackerJsonArray, bitmapData: BitmapData, ?xscl, ?yscl ) {
+	static public function fromTexturePackerJsonArray( data: TexturePackerJsonArray, bitmapData: BitmapData, ?xscl, ?yscl ) {
 		var self = new Atlas( bitmapData, xscl, yscl );		
 		
 		for ( frame in data.frames ) {
@@ -97,6 +97,7 @@ class Atlas {
 		framesCache[name] = framesFromStrings( frames );	
 	}
 
+	/*
 	public function cacheGlyphs( name: String, path: String, chars: String, ?specialSymbolsMapping: Map<String,String> ) {
 		var ssmap = specialSymbolsMapping != null ? specialSymbolsMapping : specialSymbols;
 		var s = [""];
@@ -114,7 +115,7 @@ class Atlas {
 		glyphsCache[name] = framesList; 
 		mappingsCache[name] = mapping;
 	}
-	
+	*/
 	function scaleBitmapData( bitmapData: BitmapData, xscl: Float, yscl: Float ) {
 		var matrix = new openfl.geom.Matrix(xscl, 0,0,yscl, 0, 0);
 		var newBitmapData = new BitmapData( Std.int(bitmapData.width * xscl), Std.int(bitmapData.height * yscl), true, 0x000000);

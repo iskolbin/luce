@@ -2,8 +2,7 @@ package luce;
 
 // Compiler defs:
 // 
-// batch_no_altered_test -- dont test batch for altering
-// batch_no_changed_test -- dont test batch for actual change
+// batch_minimal -- use only x, y, id for rendering
 
 import openfl.display.Tilesheet;
 import openfl.display.BitmapData;
@@ -12,15 +11,12 @@ import de.polygonal.Printf;
 
 interface BatchRenderer {
 	public function render( batch: Batch ): Void;
+	public function clear(): Void;
 }
 
 class Batch {
-#if batch_minimal
-	public static inline var WGT_SIZE = 3
-#else 
-	public static inline var WGT_SIZE = 11 
-#end;
-
+	static public inline var WGT_SIZE = #if batch_minimal 3 #else 11 #end;
+	
 	public var namedWidgets(default,null) = new Map<String,Widget>();
 	public var renderList(default,null) = new Array<Float>();
 	public var pointableList(default,null) = new Array<Widget>();
@@ -31,6 +27,13 @@ class Batch {
 	public var count(default,null): Int = 0;
 	public var renderer(default,null): BatchRenderer;
 	public var allowInvisiblePointables: Bool = false;
+	public var glyphsCache(default,null) = new Map<String, Array<Float>>();
+	public var mappingsCache(default,null) = new Map<String, Map<Int,Float>>();
+	
+	//static public var noSpecialMapping = new Map<String,String>();
+	static public var specialSymbols: Map<String,String> = [
+		"." => "dot", "," => "comma", "\\" => "backslash", "/" => "slash", "&" => "ampersand"
+		];
 
 	public function setCenter( x: Float, y: Float ) {
 		for ( id in 0...count ) {
@@ -87,55 +90,53 @@ class Batch {
 		return cast newWidget( args );
 	}
 
-	public inline function getX( shift: Int ) { return renderList[shift] - centerX; }
-	public inline function getY( shift: Int ) { return renderList[shift+1] - centerY; }
-	public inline function getCX( shift: Int ) { return renderList[shift]; }
-	public inline function getCY( shift: Int ) { return renderList[shift+1]; }
-	public inline function getFrame( shift: Int ) { return renderList[shift+2]; }
-	public inline function getTA( shift: Int ) { return renderList[shift+3]; }
-	public inline function getTB( shift: Int ) { return renderList[shift+4]; }
-	public inline function getTC( shift: Int ) { return renderList[shift+5]; }
-	public inline function getTD( shift: Int ) { return renderList[shift+6]; }
-	public inline function getR( shift: Int ) { return renderList[shift+7]; }
-	public inline function getG( shift: Int ) { return renderList[shift+8]; }
-	public inline function getB( shift: Int ) { return renderList[shift+9]; }
-	public inline function getA( shift: Int ) { return renderList[shift+10]; }
+	public inline function getX( shift: Int )     return renderList[shift] - centerX;
+	public inline function getY( shift: Int )     return renderList[shift+1] - centerY;
+	public inline function getCX( shift: Int )    return renderList[shift];
+	public inline function getCY( shift: Int )    return renderList[shift+1];
+	public inline function getFrame( shift: Int ) return renderList[shift+2];
+	public inline function getTA( shift: Int )    return renderList[shift+3];
+	public inline function getTB( shift: Int )    return renderList[shift+4];
+	public inline function getTC( shift: Int )    return renderList[shift+5];
+	public inline function getTD( shift: Int )    return renderList[shift+6];
+	public inline function getR( shift: Int )     return renderList[shift+7];
+	public inline function getG( shift: Int )     return renderList[shift+8];
+	public inline function getB( shift: Int )     return renderList[shift+9];
+	public inline function getA( shift: Int )     return renderList[shift+10];
 
-	public inline function setX( shift: Int, v: Float ) { setRList( shift, 0, v + centerX); }
-	public inline function setY( shift: Int, v: Float ) { setRList( shift, 1, v + centerY); }
-	public inline function setFrame( shift: Int, v: Float ) { setRList( shift, 2, v); }
-	public inline function setTA( shift: Int, v: Float ) { setRList( shift, 3, v); }
-	public inline function setTB( shift: Int, v: Float ) { setRList( shift, 4, v); }
-	public inline function setTC( shift: Int, v: Float ) { setRList( shift, 5, v); }
-	public inline function setTD( shift: Int, v: Float ) { setRList( shift, 6, v); }
-	public inline function setR( shift: Int, v: Float )  { setRList( shift, 7, v); }
-	public inline function setG( shift: Int, v: Float )  { setRList( shift, 8, v); }
-	public inline function setB( shift: Int, v: Float )  { setRList( shift, 9, v); }
-	public inline function setA( shift: Int, v: Float )  { setRList( shift, 10, v); }
+	public inline function setX( shift: Int, v: Float )     setRList( shift, 0, v + centerX);
+	public inline function setY( shift: Int, v: Float )     setRList( shift, 1, v + centerY);
+	public inline function setFrame( shift: Int, v: Float ) setRList( shift, 2, v);
+	public inline function setTA( shift: Int, v: Float )    setRList( shift, 3, v);
+	public inline function setTB( shift: Int, v: Float )    setRList( shift, 4, v);
+	public inline function setTC( shift: Int, v: Float )    setRList( shift, 5, v);
+	public inline function setTD( shift: Int, v: Float )    setRList( shift, 6, v);
+	public inline function setR( shift: Int, v: Float )     setRList( shift, 7, v);
+	public inline function setG( shift: Int, v: Float )     setRList( shift, 8, v);
+	public inline function setB( shift: Int, v: Float )     setRList( shift, 9, v);
+	public inline function setA( shift: Int, v: Float )     setRList( shift, 10, v);
 
 	inline function setRList( shift, idx: Int, v: Float ) {
 #if batch_minimal
 		if ( idx >= 3 ) return;
 #end
-#if batch_no_changed_test
 		renderList[shift+idx] = v; 
-	#if !batch_no_altered_test
 		altered = true;
-	#end
-#else
 		if ( renderList[shift+idx] != v ) {
 			renderList[shift+idx] = v;
 			altered = true;
 		}
-#end
 	}
 
 	public inline function render() {
-#if !batch_no_altered_test
 		if ( !altered ) return;
-#end
 		renderer.render( this );
 		altered = false;
+	}
+
+	public inline function clear() {
+		renderer.clear();
+		altered = true;
 	}
 
 	public inline function getPointablesAt( x: Float, y: Float ) {
@@ -174,13 +175,6 @@ class Batch {
 			}
 		}
 	}
-	public var glyphsCache(default,null) = new Map<String, Array<Float>>();
-	public var mappingsCache(default,null) = new Map<String, Map<Int,Float>>();
-	
-	public static var noSpecialMapping = new Map<String,String>();
-	public static var specialSymbols: Map<String,String> = [
-		"." => "dot", "," => "comma", "\\" => "backslash", "/" => "slash", "&" => "ampersand"
-		];
 
 	public function cacheGlyphs( name: String, path: String, chars: String, ?specialSymbolsMapping: Map<String,String> ) {
 		var ssmap = specialSymbolsMapping != null ? specialSymbolsMapping : specialSymbols;

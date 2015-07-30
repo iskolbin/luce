@@ -8,10 +8,14 @@ class RendererCopyPixels implements Batch.BatchRenderer {
 	var auxPoint = new Point( 0, 0 );
 	var zeroPoint = new Point( 0, 0 );
 	var auxRect = new Rectangle( 0, 0, 0, 0 );
-	var buffer: BitmapData;
+	public var buffer(default,null): BitmapData = null;
 
 	public function new( buffer: BitmapData ) {
 		this.buffer = buffer;
+	}
+
+	public inline function clear() {
+		buffer.fillRect( buffer.rect, 0 );
 	}
 
 	public inline function render( batch: Batch ) {
