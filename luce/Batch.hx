@@ -8,6 +8,7 @@ import openfl.display.Tilesheet;
 import openfl.display.BitmapData;
 import openfl.geom.Point;
 import de.polygonal.Printf;
+import haxe.ds.Vector;
 
 interface BatchRenderer {
 	public function render( batch: Batch ): Void;
@@ -29,7 +30,12 @@ class Batch {
 	public var allowInvisiblePointables: Bool = false;
 	public var glyphsCache(default,null) = new Map<String, Array<Float>>();
 	public var mappingsCache(default,null) = new Map<String, Map<Int,Float>>();
-	
+	public var scrolling: Bool = false;
+	public var scrollXmin: Float = 0;
+	public var scrollYmin: Float = 0;
+	public var scrollXmax: Float = 0;
+	public var scrollYmax: Float = 0;
+
 	//static public var noSpecialMapping = new Map<String,String>();
 	static public var specialSymbols: Map<String,String> = [
 		"." => "dot", "," => "comma", "\\" => "backslash", "/" => "slash", "&" => "ampersand"
@@ -45,9 +51,17 @@ class Batch {
 		altered = true;
 	}
 
-	public function new( atlas: Atlas, renderer: BatchRenderer  ) {
+	public function new( atlas: Atlas, renderer: BatchRenderer, ?scroll: Array<Float>  ) {
 		this.atlas = atlas;
 		this.renderer = renderer;
+		
+		if ( scroll != null ) {
+			scrollXmin = scroll[0];
+			scrollYmin = scroll[1];
+			scrollXmax = scroll[2];
+			scrollYmax = scroll[3];
+			scrolling = true;
+		}
 	}
 
 	public inline function alter() altered = true;
@@ -106,17 +120,17 @@ class Batch {
 
 	public inline function setX( shift: Int, v: Float )     setRList( shift, 0, v + centerX);
 	public inline function setY( shift: Int, v: Float )     setRList( shift, 1, v + centerY);
-	public inline function setFrame( shift: Int, v: Float ) setRList( shift, 2, v);
+	public inline function setFrame( shift: Int, v: Float ) setRList( shift, 2, v); 
 	public inline function setTA( shift: Int, v: Float )    setRList( shift, 3, v);
 	public inline function setTB( shift: Int, v: Float )    setRList( shift, 4, v);
 	public inline function setTC( shift: Int, v: Float )    setRList( shift, 5, v);
-	public inline function setTD( shift: Int, v: Float )    setRList( shift, 6, v);
+	public inline function setTD( shift: Int, v: Float )    setRList( shift, 6, v); 
 	public inline function setR( shift: Int, v: Float )     setRList( shift, 7, v);
 	public inline function setG( shift: Int, v: Float )     setRList( shift, 8, v);
 	public inline function setB( shift: Int, v: Float )     setRList( shift, 9, v);
 	public inline function setA( shift: Int, v: Float )     setRList( shift, 10, v);
 
-	inline function setRList( shift, idx: Int, v: Float ) {
+	inline function setRList( shift: Int, idx: Int, v: Float ) {
 #if batch_minimal
 		if ( idx >= 3 ) return;
 #end

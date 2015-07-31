@@ -19,9 +19,9 @@ class RendererCopyPixels implements Batch.BatchRenderer {
 	}
 
 	public inline function render( batch: Batch ) {
-		var shift = 0;
-		
+		var shift = -Batch.WGT_SIZE;
 		for ( i in 0...batch.count) {
+			shift += Batch.WGT_SIZE;
 			var id_ = batch.getFrame(shift);
 			if ( id_ != Atlas.NULL ) {
 				var id = Std.int( id_ );
@@ -38,35 +38,39 @@ class RendererCopyPixels implements Batch.BatchRenderer {
 				} else {
 					if ( xmin < buffer.width && xmax >= 0 && ymin < buffer.height && ymax >= 0 ) {
 						auxRect.x = rect.x;
-						auxRect.y = rect.y;
 						auxRect.width = rect.width;
-						auxRect.height = rect.height;
 
-						if ( xmin < 0 ) {
+						if ( xmin < 0.0 ) {
 							auxPoint.x = 0;
 							auxRect.x -= xmin;
 							auxRect.width += xmin;
 						}
 					
-						if ( ymin < 0 ) {
-							auxPoint.y = 0;
-							auxRect.y -= ymin;
-							auxRect.height += ymin;
-						} 
-						
 						if ( xmax >= buffer.width ) {
 							auxRect.width -= ( xmax - buffer.width + 1 );
 						} 
+							
+						if ( auxRect.width >= 1.0 ) {
+							auxRect.y = rect.y;
+							auxRect.height = rect.height;
 						
-						if ( ymax >= buffer.height ) {
-							auxRect.height -= ( ymax - buffer.height + 1 ); 
+							if ( ymin < 0.0 ) {
+								auxPoint.y = 0.0;
+								auxRect.y -= ymin;
+								auxRect.height += ymin;
+							} 
+						
+							if ( ymax >= buffer.height ) {
+								auxRect.height -= ( ymax - buffer.height + 1 ); 
+							}
+						
+							if ( auxRect.height >= 1.0 ) {
+								buffer.copyPixels( batch.atlas.bitmapData, auxRect, auxPoint, null, zeroPoint, true );
+							}
 						}
-						
-						buffer.copyPixels( batch.atlas.bitmapData, auxRect, auxPoint, null, zeroPoint, true );
 					}
 				}
 			}
-			shift += Batch.WGT_SIZE;
 		}
 	}
 }

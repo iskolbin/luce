@@ -223,6 +223,7 @@ class Widget implements Tween.Tweenable {
 		} else {
 			batch.setX( shift, xWld );
 		}
+		_updateScroll();
 	}
 
 	inline function updateY() {
@@ -232,6 +233,7 @@ class Widget implements Tween.Tweenable {
 		} else {
 			batch.setY( shift, yWld );
 		}
+		_updateScroll();
 	}
 
 	inline function updateXScl() {
@@ -245,6 +247,7 @@ class Widget implements Tween.Tweenable {
 		if ( testFlag( NotCentred )) {
 			_updatePivot();
 		}
+		_updateScroll();
 	}
 
 	inline function updateYScl() {
@@ -258,6 +261,7 @@ class Widget implements Tween.Tweenable {
 		if ( testFlag( NotCentred ) ) {
 			_updatePivot();
 		}
+		_updateScroll();
 	}
 
 	inline function updateXSkw() {
@@ -271,6 +275,7 @@ class Widget implements Tween.Tweenable {
 		if ( testFlag( NotCentred )) {
 			_updatePivot();
 		}
+		_updateScroll();
 	}
 	
 	inline function updateYSkw() {
@@ -284,6 +289,7 @@ class Widget implements Tween.Tweenable {
 		if ( testFlag( NotCentred )) {
 			_updatePivot();
 		}
+		_updateScroll();
 	}
 
 	inline function _updateTransform() {
@@ -301,6 +307,7 @@ class Widget implements Tween.Tweenable {
 		if ( testFlag( NotCentred )) {
 			_updatePivot();
 		}
+		_updateScroll();
 	}
 
 	inline function updateRot() {
@@ -316,6 +323,28 @@ class Widget implements Tween.Tweenable {
 			unsetFlag( Rotated );
 		}
 		_updateTransform();
+	}
+
+	inline function _updateScroll() {
+		if ( batch.scrolling ) {
+			if ( !visibleWld || frameWld == Atlas.NULL ) {
+				batch.setFrame( shift, Atlas.NULL );
+			} else {		
+				var frameIdx = framesList[Std.int( frameWld )];
+				var id = Std.int( frameIdx );
+				var c = batch.atlas.centers[id];
+				var rect = batch.atlas.rects[id];
+				var xmin = xWld - c.x;
+				var ymin = yWld - c.y;
+				var xmax = xmin + rect.width;
+				var ymax = ymin + rect.height;
+				if ( xmin > batch.scrollXmax || xmax < batch.scrollXmin || ymin > batch.scrollYmax || ymax < batch.scrollYmin ) {
+					batch.setFrame( shift, Atlas.NULL );
+				} else {
+					batch.setFrame( shift, frameIdx );
+				}
+			}
+		}
 	}
 
 	inline function _updateFrameVisible() {
