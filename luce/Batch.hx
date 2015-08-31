@@ -37,9 +37,9 @@ class Batch {
 	public var scrollYmax: Float = 0;
 
 	//static public var noSpecialMapping = new Map<String,String>();
-	static public var specialSymbols: Map<String,String> = [
-		"." => "dot", "," => "comma", "\\" => "backslash", "/" => "slash", "&" => "ampersand"
-		];
+//	static public var specialSymbols: Map<String,String> = [
+//		"." => "dot", "," => "comma", "\\" => "backslash", "/" => "slash", "&" => "ampersand"
+//		];
 
 	public function setCenter( x: Float, y: Float ) {
 		for ( id in 0...count ) {
@@ -190,15 +190,15 @@ class Batch {
 		}
 	}
 
-	public function cacheGlyphs( name: String, path: String, chars: String, ?specialSymbolsMapping: Map<String,String> ) {
-		var ssmap = specialSymbolsMapping != null ? specialSymbolsMapping : specialSymbols;
-		var s = [""];
+	public function cacheGlyphs( name: String, path: String, chars: String/*,?specialSymbolsMapping: Map<String,String> */) {
+		//var ssmap = specialSymbolsMapping != null ? specialSymbolsMapping : specialSymbols;
+		var s = [0];
 		var framesList = new Array<Float>();
 		var mapping  = new Map<Int,Float>();
 		for ( i in 0...chars.length ) {
-			var c = chars.charAt( i );
-			var c_ = specialSymbols[c];
-			s[0] = c_ != null ? c_ : c;
+			//var c = chars.charCodeAt( i );
+			//var c_ = specialSymbols[c];
+			s[0] = chars.charCodeAt( i );
 			var id = atlas.ids[Printf.format( path, s )]; 
 			mapping[chars.charCodeAt( i )] = framesList.length;
 			framesList.push( id );

@@ -68,7 +68,7 @@ class Text extends Widget {
 
 		if ( args.framesList != null ) {
 			framesList = args.framesList;
-		} else if	( args.frames != null ) {
+		} else if ( args.frames != null ) {
 			framesList = batch.newFramesList( args.frames );
 		} else if ( args.cached != null ) {
 			framesList = batch.glyphsCache[args.cached];
@@ -119,7 +119,7 @@ class Text extends Widget {
 		for ( i in 0...length ) {
 			var hw = 0.5*getGlyphWidth( i );
 			w += hw;
-			glyphs[i].x = w + x0;
+			glyphs[i].x = Math.floor( w + x0 );
 
 			w += hw;
 			w += tracking;
