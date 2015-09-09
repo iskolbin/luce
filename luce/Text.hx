@@ -25,6 +25,7 @@ class Text extends Widget {
 	static public inline var NONE: Int = -0xfff;
 	static public inline var SPACE: Int = -0xffe;
 
+	public var string(default,set): String = "";
 	public var length(default,null): Int = 0;
 	public var glyphs(default,null): Vector<Widget>;
 	public var codes(default,null): Vector<Int>;
@@ -95,9 +96,9 @@ class Text extends Widget {
 		if ( args.codes != null ) {
 			setCodes( args.codes );
 		} else if ( args.string != null ) {
-			setString( args.string );
+			set_string( args.string );
 		} else {
-			setString( "" );
+			set_string( "" );
 		}
 	}
 
@@ -149,8 +150,9 @@ class Text extends Widget {
 		updateGlyphs();
 	}	
 
-	public function setString( string: String ) {
+	public function set_string( string: String ) {
 		var n = string.length < glyphs.length ? string.length: glyphs.length;
+		this.string = string;
 		for ( i in 0...n ) {
 			if ( string.charAt( i ) == ' ' ) {
 				glyphs[i].visible = false;
@@ -168,5 +170,6 @@ class Text extends Widget {
 		}
 		length = n;
 		updateGlyphs();
+		return string;
 	}
 }
