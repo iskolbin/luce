@@ -4,7 +4,6 @@ import openfl.display.Tilesheet;
 import openfl.display.BitmapData;
 import openfl.geom.Rectangle;
 import openfl.geom.Point;
-import de.polygonal.Printf;
 
 typedef TexturePackerJsonFrame = {
 	?filename: String,
@@ -38,8 +37,6 @@ class Atlas {
 	public var framesCache(default,null) = new Map<String, Array<Float>>();
 	public var glyphsCache(default,null) = new Map<String, Array<Float>>();
 	public var mappingsCache(default,null) = new Map<String, Map<Int,Float>>();
-//	static public var noSpecialMapping = new Map<String,String>();
-//	static public var specialSymbols: Map<String,String> = ["." => "dot", "," => "comma", "\\" => "backslash", "/" => "slash", "&" => "ampersand"];
 	static public inline var NULL: Float = 0;
 
 	var count: Int = 0;
@@ -97,25 +94,6 @@ class Atlas {
 		framesCache[name] = framesFromStrings( frames );	
 	}
 
-	/*
-	public function cacheGlyphs( name: String, path: String, chars: String, ?specialSymbolsMapping: Map<String,String> ) {
-		var ssmap = specialSymbolsMapping != null ? specialSymbolsMapping : specialSymbols;
-		var s = [""];
-		var framesList = new Array<Float>();
-		var mapping  = new Map<Int,Float>();
-		for ( i in 0...chars.length ) {
-			var c = chars.charAt( i );
-			var c_ = specialSymbols[c];
-			s[0] = c_ != null ? c_ : c;
-			var id = ids[Printf.format( path, s )]; 
-			mapping[chars.charCodeAt( i )] = framesList.length;
-			framesList.push( id );
-		}
-
-		glyphsCache[name] = framesList; 
-		mappingsCache[name] = mapping;
-	}
-	*/
 	function scaleBitmapData( bitmapData: BitmapData, xscl: Float, yscl: Float ) {
 		var matrix = new openfl.geom.Matrix(xscl, 0,0,yscl, 0, 0);
 		var newBitmapData = new BitmapData( Std.int(bitmapData.width * xscl), Std.int(bitmapData.height * yscl), true, 0x000000);

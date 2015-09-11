@@ -36,11 +36,6 @@ class Batch {
 	public var scrollXmax: Float = 0;
 	public var scrollYmax: Float = 0;
 
-	//static public var noSpecialMapping = new Map<String,String>();
-//	static public var specialSymbols: Map<String,String> = [
-//		"." => "dot", "," => "comma", "\\" => "backslash", "/" => "slash", "&" => "ampersand"
-//		];
-
 	public function setCenter( x: Float, y: Float ) {
 		for ( id in 0...count ) {
 			renderList[id*WGT_SIZE] += ( x - centerX );
