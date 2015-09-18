@@ -120,7 +120,8 @@ class Text extends Widget {
 		for ( i in 0...length ) {
 			var hw = 0.5*getGlyphWidth( i );
 			w += hw;
-			glyphs[i].x = Math.floor( w + x0 );
+			glyphs[i].x = w + x0;
+			//Math.floor( w + x0 );
 
 			w += hw;
 			w += tracking;
