@@ -4,10 +4,6 @@ package luce;
 // 
 // batch_minimal -- use only x, y, id for rendering
 
-import openfl.display.Tilesheet;
-import openfl.display.BitmapData;
-import openfl.geom.Point;
-import de.polygonal.Printf;
 import haxe.ds.Vector;
 
 interface BatchRenderer {
@@ -186,15 +182,11 @@ class Batch {
 	}
 
 	public function cacheGlyphs( name: String, path: String, chars: String/*,?specialSymbolsMapping: Map<String,String> */) {
-		//var ssmap = specialSymbolsMapping != null ? specialSymbolsMapping : specialSymbols;
-		var s = [0];
 		var framesList = new Array<Float>();
 		var mapping  = new Map<Int,Float>();
+		var prd = ~/%d/;
 		for ( i in 0...chars.length ) {
-			//var c = chars.charCodeAt( i );
-			//var c_ = specialSymbols[c];
-			s[0] = chars.charCodeAt( i );
-			var id = atlas.ids[Printf.format( path, s )]; 
+			var id = atlas.ids[ prd.replace( path, Std.string( chars.charCodeAt( i ))) ];
 			mapping[chars.charCodeAt( i )] = framesList.length;
 			framesList.push( id );
 		}
