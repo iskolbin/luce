@@ -184,7 +184,7 @@ class Batch {
 	public function cacheGlyphs( name: String, path: String, chars: String/*,?specialSymbolsMapping: Map<String,String> */) {
 		var framesList = new Array<Float>();
 		var mapping  = new Map<Int,Float>();
-		var prd = ~/%d/;
+		var prd = ~/%./;
 		for ( i in 0...chars.length ) {
 			var id = atlas.ids[ prd.replace( path, Std.string( chars.charCodeAt( i ))) ];
 			mapping[chars.charCodeAt( i )] = framesList.length;
