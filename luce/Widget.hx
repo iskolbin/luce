@@ -39,7 +39,7 @@ class Widget implements Tween.Tweenable {
 	public var hit(default,null): Array<Float> = null;
 	public var shift(default,null): Int = 0;
 	public var batch(default,null): Batch;
-	public var onPointer: Widget->Float->Float->Int->Bool = onPointerDoNothing;
+	public var onPointer(default,set): Widget->Float->Float->Int->Bool = onPointerDoNothing;
 	
 	
 	public var x(default,set)       = 0.0;	
@@ -56,7 +56,18 @@ class Widget implements Tween.Tweenable {
 	public var pointable(get,null): Bool; 
 	
 	public inline function get_pointable() return onPointer != onPointerDoNothing;
-	
+	public inline function set_onPointer( v: Widget->Float->Float->Int->Bool ) {
+		if ( v == null || v == onPointerDoNothing ) {
+			onPointer = onPointerDoNothing;
+			batch.removePointable( this );
+			return onPointerDoNothing;
+		} else {
+			onPointer = v;
+			batch.addPointable( this );
+			return v;
+		}			
+	}
+
 	// Setters
 	public inline function set_x(v)       { this.x = v; updateX(); return v; }
 	public inline function set_y(v)       { this.y = v; updateY(); return v; }
@@ -64,6 +75,7 @@ class Widget implements Tween.Tweenable {
 	public inline function set_visible(v) { this.visible = v; updateVisible(); return v; }
 
 	public inline function pointInside( xp: Float, yp: Float ) {
+		trace( xp, yp, xWld, yWld, hit );
 		return xp >= xWld + hit[0] && yp >= yWld + hit[1] && xp <= xWld+hit[2] && yp <= yWld+hit[3]; 
 	}
 
@@ -78,28 +90,39 @@ class Widget implements Tween.Tweenable {
 
 	public inline function setAttr( attr: Int, v: Float ) {
 		switch ( attr ) {
-			case X: x = v; updateX();
-			case Y: y = v; updateY();
-			case Frame: frame = v; updateFrame();
+			case X: x = v;
+			case Y: y = v;
+			case Frame: frame = v;
 		}
 	}
 
-	inline function updateX() {
+	function updateX() {
 		xWld = x;
 		if ( parent != null ) {
 			xWld += parent.xWld; 
 		}
 		batch.setX( shift, xWld );
-		updateScissor();
+		//updateScissor();
+		if ( children != null ) {
+			for ( c in children ) {
+				c.updateX();
+			}
+		}
 	}
 
-	inline function updateY() {
+	function updateY() {
 		yWld = y;
 		if ( parent != null ) {
 			yWld += parent.yWld; 
 		}
 		batch.setY( shift, yWld );
-		updateScissor();
+	//	updateScissor();
+	
+		if ( children != null ) {
+			for ( c in children ) {
+				c.updateY();
+			}
+		}
 	}
 
 	inline function updateScissor() {
@@ -126,32 +149,38 @@ class Widget implements Tween.Tweenable {
 		updateFrameVisible();
 	}
 
-	inline function updateVisible() { 
+	function updateVisible() { 
 		if ( parent != null ) {
 			visibleWld = visible && parent.visibleWld;
 		} else {
 			visibleWld = visible;
 		}
 		updateFrameVisible(); 
+		if ( children != null ) {
+			for ( c in children ) {
+				c.updateVisible();
+			}
+		}
 	}
 	
 	inline function updateAll() {
 		updateX();
 		updateY();
+		updateFrame();
 		updateVisible();
 	}
 
-	public function setParent( parent_: Widget ) {
-		if ( parent != parent_ ) {
-			if ( parent_ == null ) {
+	public function setParent( newParent: Widget ) {
+		if ( parent != newParent ) {
+			if ( newParent == null ) {
 				parent.removeChild( this );
 			} else if ( parent == null ) {
-				parent_.addChild( this );
+				newParent.addChild( this );
 			} else {
 				parent.removeChild( this );
-				parent_.addChild( this );
+				newParent.addChild( this );
 			}
-		} 
+		}
 	}
 
 	public function addChild( child: Widget ) {
@@ -162,9 +191,11 @@ class Widget implements Tween.Tweenable {
 			if ( children == null ) {
 				children = new Array<Widget>();
 				children.push( child );
+				child.parent = this;
 			} else {
 				if ( children.indexOf( child ) == -1 ) {
 					children.push( child );
+					child.parent = this;
 				}
 			}
 			child.updateAll();
@@ -175,7 +206,7 @@ class Widget implements Tween.Tweenable {
 		if ( child.parent == this ) {	
 			children.remove( child );
 			child.parent = null;
-			updateAll();
+			child.updateAll();
 		}
 	}
 
@@ -199,7 +230,6 @@ class Widget implements Tween.Tweenable {
 	inline function init( args: WidgetConfig ) {
 		x = args.x != null ? args.x : 0;
 		y = args.y != null ? args.y : 0;
-		frame = args.frame != null ? args.frame : 0;
 		visible = args.visible != null ? args.visible : true;
 		
 		if ( args.frames != null && args.frames != NULL_STRINGS  ) {
@@ -207,6 +237,8 @@ class Widget implements Tween.Tweenable {
 		} else if ( args.framesList != null ) {
 			framesList = args.framesList;
 		} 
+		
+		frame = args.frame != null ? args.frame : 0;
 		
 		if ( args.hit != null ) {
 			hit = args.hit;

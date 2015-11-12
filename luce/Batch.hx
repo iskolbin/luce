@@ -68,6 +68,7 @@ class Batch {
 		}
 
 		if ( wgt.pointable ) {
+			trace("ADDED POINTABLE");
 			pointableList.push( wgt );
 		}
 
@@ -101,8 +102,6 @@ class Batch {
 	public inline function setFrame( shift: Int, v: Float ) setRList( shift, 2, v); 
 
 	inline function setRList( shift: Int, idx: Int, v: Float ) {
-		renderList[shift+idx] = v; 
-		altered = true;
 		if ( renderList[shift+idx] != v ) {
 			renderList[shift+idx] = v;
 			altered = true;
@@ -123,6 +122,16 @@ class Batch {
 	public inline function getPointablesAt( x: Float, y: Float ) {
 		// TODO: Spatial optimizations
 		return pointableList;
+	}
+
+	public inline function addPointable( w: Widget ) {
+		if ( pointableList.indexOf( w ) == -1 ) {
+			pointableList.push( w );
+		}
+	}
+
+	public inline function removePointable( w: Widget ) {
+		pointableList.remove( w );
 	}
 
 	public inline static var MOVE = 1;
@@ -146,6 +155,7 @@ class Batch {
 	public inline static var TOUCH_10 = TOUCH_9 << 1;
 	
 	public inline function onPointer( x: Float, y: Float, msg: Int ) {
+		trace( getPointablesAt(x,y).length, x, y );
 		for ( w in getPointablesAt( x, y )) {
 			if ( w.pointInside( x, y )) {
 				if ( w.visible ) {
