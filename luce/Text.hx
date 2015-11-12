@@ -86,8 +86,7 @@ class Text extends Widget {
 		}
 
 		for ( i in 0...glyphs.length ) {
-			// TODO: more parent
-			glyphs[i] = batch.newWidget( {framesList: framesList, parent: {x: this, y: this, visible: this }} );
+			glyphs[i] = batch.newWidget( {framesList: framesList, parent: this } );
 		}
 
 		x = x_;

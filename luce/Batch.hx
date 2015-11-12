@@ -1,9 +1,5 @@
 package luce;
 
-// Compiler defs:
-// 
-// batch_minimal -- use only x, y, id for rendering
-
 import haxe.ds.Vector;
 
 interface BatchRenderer {
@@ -12,7 +8,7 @@ interface BatchRenderer {
 }
 
 class Batch {
-	static public inline var WGT_SIZE = #if batch_minimal 3 #else 11 #end;
+	static public inline var WGT_SIZE = 3;
 	
 	public var namedWidgets(default,null) = new Map<String,Widget>();
 	public var renderList(default,null) = new Array<Float>();
@@ -23,7 +19,6 @@ class Batch {
 	public var centerY(default,null): Float = 0;
 	public var count(default,null): Int = 0;
 	public var renderer(default,null): BatchRenderer;
-	public var allowInvisiblePointables: Bool = false;
 	public var glyphsCache(default,null) = new Map<String, Array<Float>>();
 	public var mappingsCache(default,null) = new Map<String, Map<Int,Float>>();
 	public var scrolling: Bool = false;
@@ -72,7 +67,7 @@ class Batch {
 			new Widget( this, shift, args );
 		}
 
-		if ( wgt.isPointable() ) {
+		if ( wgt.pointable ) {
 			pointableList.push( wgt );
 		}
 
@@ -100,31 +95,12 @@ class Batch {
 	public inline function getCX( shift: Int )    return renderList[shift];
 	public inline function getCY( shift: Int )    return renderList[shift+1];
 	public inline function getFrame( shift: Int ) return renderList[shift+2];
-	public inline function getTA( shift: Int )    return renderList[shift+3];
-	public inline function getTB( shift: Int )    return renderList[shift+4];
-	public inline function getTC( shift: Int )    return renderList[shift+5];
-	public inline function getTD( shift: Int )    return renderList[shift+6];
-	public inline function getR( shift: Int )     return renderList[shift+7];
-	public inline function getG( shift: Int )     return renderList[shift+8];
-	public inline function getB( shift: Int )     return renderList[shift+9];
-	public inline function getA( shift: Int )     return renderList[shift+10];
 
 	public inline function setX( shift: Int, v: Float )     setRList( shift, 0, v + centerX);
 	public inline function setY( shift: Int, v: Float )     setRList( shift, 1, v + centerY);
 	public inline function setFrame( shift: Int, v: Float ) setRList( shift, 2, v); 
-	public inline function setTA( shift: Int, v: Float )    setRList( shift, 3, v);
-	public inline function setTB( shift: Int, v: Float )    setRList( shift, 4, v);
-	public inline function setTC( shift: Int, v: Float )    setRList( shift, 5, v);
-	public inline function setTD( shift: Int, v: Float )    setRList( shift, 6, v); 
-	public inline function setR( shift: Int, v: Float )     setRList( shift, 7, v);
-	public inline function setG( shift: Int, v: Float )     setRList( shift, 8, v);
-	public inline function setB( shift: Int, v: Float )     setRList( shift, 9, v);
-	public inline function setA( shift: Int, v: Float )     setRList( shift, 10, v);
 
 	inline function setRList( shift: Int, idx: Int, v: Float ) {
-#if batch_minimal
-		if ( idx >= 3 ) return;
-#end
 		renderList[shift+idx] = v; 
 		altered = true;
 		if ( renderList[shift+idx] != v ) {
@@ -172,7 +148,7 @@ class Batch {
 	public inline function onPointer( x: Float, y: Float, msg: Int ) {
 		for ( w in getPointablesAt( x, y )) {
 			if ( w.pointInside( x, y )) {
-				if ( w.visible || allowInvisiblePointables ) {
+				if ( w.visible ) {
 					if (!w.onPointer( w, x, y, msg )) {
 						break;
 					}
@@ -181,7 +157,7 @@ class Batch {
 		}
 	}
 
-	public function cacheGlyphs( name: String, path: String, chars: String/*,?specialSymbolsMapping: Map<String,String> */) {
+	public function cacheGlyphs( name: String, path: String, chars: String ) {
 		var framesList = new Array<Float>();
 		var mapping  = new Map<Int,Float>();
 		var prd = ~/%./;

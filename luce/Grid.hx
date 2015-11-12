@@ -45,13 +45,11 @@ class Grid extends Widget {
 		for ( x in 0...cols ) {
 			grid[x] = new Array<Widget>();
 			for ( y in 0...rows ) {
-				// TODO: more parent
-				// TODO: align (now center)
 				grid[x][y] = batch.newWidget( {
 					x: (-0.5*(cols-1)+x)*cellWidth, 
 					y: (-0.5*(rows-1)+y)*cellHeight, 
 					framesList: framesList, 
-					parent: {x: this, y: this, visible: this }} );
+					parent: this } );
 			}
 		}
 

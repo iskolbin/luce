@@ -31,18 +31,15 @@ class Atlas {
 	public var centers(default,null) = new Array<Point>();
 	public var tilesheet(default,null): Tilesheet;
 	public var bitmapData(default,null): BitmapData;
-	public var ids9patch(default,null) = new Map<String, Array<Float>>();
-	public var xscl(default,null) = 1.0;
-	public var yscl(default,null) = 1.0;
 	public var framesCache(default,null) = new Map<String, Array<Float>>();
 	public var glyphsCache(default,null) = new Map<String, Array<Float>>();
 	public var mappingsCache(default,null) = new Map<String, Map<Int,Float>>();
-	static public inline var NULL: Float = 0;
+	static public inline var NULL: Float = 0.0;
 
 	var count: Int = 0;
 
 	function addFrame( key: String, x: Float, y: Float, w: Float, h: Float, cx: Float, cy: Float, srcW: Float, srcH: Float ) {
-		var rect = new Rectangle( x*xscl, y*yscl, w*xscl, h*yscl );
+		var rect = new Rectangle( x, y, w, h );
 		var center = new Point( cx, cy );
 		var id: Int;
 		id = tilesheet.addTileRect( rect, center );
@@ -67,8 +64,8 @@ class Atlas {
 		addFrame( filename, frameData.x, frameData.y, frameData.w, frameData.h, cx, cy, frame.sourceSize.w, frame.sourceSize.h );
 	}
 
-	static public function fromTexturePackerJsonHash( data: TexturePackerJsonHash, bitmapData: BitmapData, ?xscl, ?yscl ) {
-		var self = new Atlas( bitmapData, xscl, yscl );
+	static public function fromTexturePackerJsonHash( data: TexturePackerJsonHash, bitmapData: BitmapData ) {
+		var self = new Atlas( bitmapData );
 		
 		for ( filename in Reflect.fields( data.frames )  ) {
 			self.addTexturePackerFrame( Reflect.field( data.frames, filename ), filename );
@@ -76,8 +73,8 @@ class Atlas {
 		return self;
 	}
 
-	static public function fromTexturePackerJsonArray( data: TexturePackerJsonArray, bitmapData: BitmapData, ?xscl, ?yscl ) {
-		var self = new Atlas( bitmapData, xscl, yscl );		
+	static public function fromTexturePackerJsonArray( data: TexturePackerJsonArray, bitmapData: BitmapData ) {	
+		var self = new Atlas( bitmapData );		
 		
 		for ( frame in data.frames ) {
 		 	self.addTexturePackerFrame( frame );
@@ -94,23 +91,8 @@ class Atlas {
 		framesCache[name] = framesFromStrings( frames );	
 	}
 
-	function scaleBitmapData( bitmapData: BitmapData, xscl: Float, yscl: Float ) {
-		var matrix = new openfl.geom.Matrix(xscl, 0,0,yscl, 0, 0);
-		var newBitmapData = new BitmapData( Std.int(bitmapData.width * xscl), Std.int(bitmapData.height * yscl), true, 0x000000);
-		newBitmapData.draw( bitmapData, matrix, null, null, null, true );
-		return newBitmapData;
-	}
-
-	function new( bitmapData: BitmapData, ?xscl, ?yscl ) {
+	function new( bitmapData: BitmapData ) {
 		this.bitmapData = bitmapData;
-		if ( xscl != null || yscl != null ) {
-			this.xscl = xscl != null ? xscl : 1.0;
-			this.yscl = yscl != null ? yscl : 1.0;
-			if ( this.xscl != 1.0 || this.yscl != 1.0 ) {
-				bitmapData = scaleBitmapData( bitmapData, this.xscl, this.yscl );
-			}
-		}
-		
 		tilesheet = new Tilesheet( bitmapData );
 		addFrame( null, 0, 0, 0, 0, 0, 0, 0, 0 );
 	}
