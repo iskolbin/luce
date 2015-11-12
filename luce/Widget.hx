@@ -75,7 +75,6 @@ class Widget implements Tween.Tweenable {
 	public inline function set_visible(v) { this.visible = v; updateVisible(); return v; }
 
 	public inline function pointInside( xp: Float, yp: Float ) {
-		trace( xp, yp, xWld, yWld, hit );
 		return xp >= xWld + hit[0] && yp >= yWld + hit[1] && xp <= xWld+hit[2] && yp <= yWld+hit[3]; 
 	}
 

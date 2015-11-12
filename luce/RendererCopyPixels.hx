@@ -19,8 +19,6 @@ class RendererCopyPixels implements Batch.BatchRenderer {
 	}
 
 	public inline function render( batch: Batch ) {
-		trace( batch.renderList );
-
 		var shift = -Batch.WGT_SIZE;
 		for ( i in 0...batch.count) {
 			shift += Batch.WGT_SIZE;

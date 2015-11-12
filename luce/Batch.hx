@@ -68,7 +68,6 @@ class Batch {
 		}
 
 		if ( wgt.pointable ) {
-			trace("ADDED POINTABLE");
 			pointableList.push( wgt );
 		}
 
@@ -155,7 +154,6 @@ class Batch {
 	public inline static var TOUCH_10 = TOUCH_9 << 1;
 	
 	public inline function onPointer( x: Float, y: Float, msg: Int ) {
-		trace( getPointablesAt(x,y).length, x, y );
 		for ( w in getPointablesAt( x, y )) {
 			if ( w.pointInside( x, y )) {
 				if ( w.visible ) {
