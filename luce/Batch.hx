@@ -12,7 +12,8 @@ class Batch {
 	
 	public var namedWidgets(default,null) = new Map<String,Widget>();
 	public var renderList(default,null) = new Array<Float>();
-	public var pointableList(default,null) = new Array<Widget>();
+	public var pointableList(default,null) = new List<Widget>();
+	public var pointableSet(default,null) = new Map<Int,Bool>();
 	public var atlas(default,null): Atlas;	
 	public var altered(default,null) = true;
 	public var centerX(default,null): Float = 0;
@@ -124,13 +125,17 @@ class Batch {
 	}
 
 	public inline function addPointable( w: Widget ) {
-		if ( pointableList.indexOf( w ) == -1 ) {
+		if ( !pointableSet.exists( w.shift )) {
 			pointableList.push( w );
+			pointableSet[w.shift] = true;
 		}
 	}
 
 	public inline function removePointable( w: Widget ) {
-		pointableList.remove( w );
+		if ( pointableSet.exists( w.shift )) {
+			pointableList.remove( w );
+			pointableSet.remove( w.shift );
+		}
 	}
 
 	public inline static var MOVE = 1;
