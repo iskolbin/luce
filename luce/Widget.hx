@@ -129,12 +129,12 @@ class Widget implements Tween.Tweenable {
 		var id = Std.int( frameIdx );
 		var c = batch.atlas.centers[id];
 		var rect = batch.atlas.rects[id];
-		var xmin = xWld - c.x;
-		var ymin = yWld - c.y;
-		var xmax = xmin + rect.width;
-		var ymax = ymin + rect.height;
+		var xmin = xWld - c[0];
+		var ymin = yWld - c[1];
+		var xmax = xmin + rect[2];
+		var ymax = ymin + rect[3];
 
-		scissored = ( xmin > batch.scrollXmax || xmax < batch.scrollXmin || ymin > batch.scrollYmax || ymax < batch.scrollYmin );
+		scissored = ( xmin > batch.scissorRect[0] || xmax < batch.scissorRect[2] || ymin > batch.scissorRect[1] || ymax < batch.scissorRect[3] );
 		updateFrameVisible();
 	}
 
@@ -215,10 +215,10 @@ class Widget implements Tween.Tweenable {
 	public inline function setLastFrame()  frame = framesList.length - 1;
 	public inline function getLastFrame()  return framesList.length-1;
 
-	public inline function getFrameWidth()  return batch.atlas.rects[Std.int( frameIdx )].width;
-	public inline function getFrameHeight() return batch.atlas.rects[Std.int( frameIdx )].height;
-	public inline function getActualFrameWidth()  return batch.atlas.rects[Std.int( framesList[Std.int( frameWld )] )].width;
-	public inline function getActualFrameHeight() return batch.atlas.rects[Std.int( framesList[Std.int( frameWld )] )].height; 
+	public inline function getFrameWidth()  return batch.atlas.rects[Std.int( frameIdx )][2];
+	public inline function getFrameHeight() return batch.atlas.rects[Std.int( frameIdx )][3];
+	public inline function getActualFrameWidth()  return batch.atlas.rects[Std.int( framesList[Std.int( frameWld )] )][2];
+	public inline function getActualFrameHeight() return batch.atlas.rects[Std.int( framesList[Std.int( frameWld )] )][3]; 
 	public inline function getFrameSourceWidth()  return batch.atlas.sourceWidth[Std.int( framesList[Std.int( frameWld )] )];
 	public inline function getFrameSourceHeight() return batch.atlas.sourceHeight[Std.int( framesList[Std.int( frameWld )] )];
 	
@@ -243,8 +243,8 @@ class Widget implements Tween.Tweenable {
 			hit = args.hit;
 		} else if ( args.hitFromFrame != null ) {
 			var f = framesList.length > args.hitFromFrame ? Std.int( framesList[args.hitFromFrame] ) : 0;
-			var w = batch.atlas.rects[f].width; 
-			var h = batch.atlas.rects[f].height;
+			var w = batch.atlas.rects[f][2]; 
+			var h = batch.atlas.rects[f][3];
 			hit = [-0.5*w,-0.5*h,0.5*w,0.5*h];
 		}
 

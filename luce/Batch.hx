@@ -2,11 +2,6 @@ package luce;
 
 import haxe.ds.Vector;
 
-interface BatchRenderer {
-	public function render( batch: Batch ): Void;
-	public function clear(): Void;
-}
-
 class Batch {
 	static public inline var WGT_SIZE = 3;
 	
@@ -15,18 +10,13 @@ class Batch {
 	public var pointableList(default,null) = new List<Widget>();
 	public var pointableSet(default,null) = new Map<Int,Bool>();
 	public var atlas(default,null): Atlas;	
-	public var altered(default,null) = true;
+	public var dirty = true;
 	public var centerX(default,null): Float = 0;
 	public var centerY(default,null): Float = 0;
 	public var count(default,null): Int = 0;
-	public var renderer(default,null): BatchRenderer;
 	public var glyphsCache(default,null) = new Map<String, Array<Float>>();
 	public var mappingsCache(default,null) = new Map<String, Map<Int,Float>>();
-	public var scrolling: Bool = false;
-	public var scrollXmin: Float = 0;
-	public var scrollYmin: Float = 0;
-	public var scrollXmax: Float = 0;
-	public var scrollYmax: Float = 0;
+	public var scissorRect(default,null): Array<Float>;
 
 	public function setCenter( x: Float, y: Float ) {
 		for ( id in 0...count ) {
@@ -35,23 +25,13 @@ class Batch {
 		}
 		centerX = x;
 		centerY = y;
-		altered = true;
+		dirty = true;
 	}
 
-	public function new( atlas: Atlas, renderer: BatchRenderer, ?scroll: Array<Float>  ) {
+	public function new( atlas: Atlas, scissorRect: Array<Float>  ) {
 		this.atlas = atlas;
-		this.renderer = renderer;
-		
-		if ( scroll != null ) {
-			scrollXmin = scroll[0];
-			scrollYmin = scroll[1];
-			scrollXmax = scroll[2];
-			scrollYmax = scroll[3];
-			scrolling = true;
-		}
+		this.scissorRect = scissorRect;	
 	}
-
-	public inline function alter() altered = true;
 
 	public inline function newWidget( args: Widget.WidgetConfig ) {
 		var shift = renderList.length;
@@ -104,19 +84,17 @@ class Batch {
 	inline function setRList( shift: Int, idx: Int, v: Float ) {
 		if ( renderList[shift+idx] != v ) {
 			renderList[shift+idx] = v;
-			altered = true;
+			dirty = true;	
 		}
 	}
 
-	public inline function render() {
-		if ( !altered ) return;
-		renderer.render( this );
-		altered = false;
+	public function render() {
+		if ( !dirty ) return;
+		dirty = false;
 	}
 
-	public inline function clear() {
-		renderer.clear();
-		altered = true;
+	public function clear() {
+		dirty = true;
 	}
 
 	public inline function getPointablesAt( x: Float, y: Float ) {

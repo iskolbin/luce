@@ -1,9 +1,6 @@
 package luce;
 
-import openfl.display.Tilesheet;
-import openfl.display.BitmapData;
-import openfl.geom.Rectangle;
-import openfl.geom.Point;
+import haxe.ds.Vector;
 
 typedef TexturePackerJsonFrame = {
 	?filename: String,
@@ -20,17 +17,15 @@ typedef TexturePackerJsonHash = {
 }
 
 typedef TexturePackerJsonArray = {
-	frames: Array< TexturePackerJsonFrame>
+	frames: Array<TexturePackerJsonFrame>
 }
 
 class Atlas {
 	public var ids(default,null) = new Map<String, Float>();
-	public var rects(default,null) = new Array<Rectangle>();
+	public var rects(default,null) = new Array<Vector<Float>>();
+	public var centers(default,null) = new Array<Vector<Float>>();
 	public var sourceWidth(default,null) = new Array<Float>();
 	public var sourceHeight(default,null) = new Array<Float>();
-	public var centers(default,null) = new Array<Point>();
-	public var tilesheet(default,null): Tilesheet;
-	public var bitmapData(default,null): BitmapData;
 	public var framesCache(default,null) = new Map<String, Array<Float>>();
 	public var glyphsCache(default,null) = new Map<String, Array<Float>>();
 	public var mappingsCache(default,null) = new Map<String, Map<Int,Float>>();
@@ -38,16 +33,24 @@ class Atlas {
 
 	var count: Int = 0;
 
-	function addFrame( key: String, x: Float, y: Float, w: Float, h: Float, cx: Float, cy: Float, srcW: Float, srcH: Float ) {
-		var rect = new Rectangle( x, y, w, h );
-		var center = new Point( cx, cy );
-		var id: Int;
-		id = tilesheet.addTileRect( rect, center );
+	function addFrameRect( x: Float, y: Float, w: Float, h: Float ) {
+		var rect = new Vector<Float>( 4 );
+		rect[0] = x; rect[1] = y; rect[2] = w; rect[3] = h;
+		rects.push( rect );	
+	}
 
-		count += 1;
+	function addFrameCenter( x: Float, y: Float ) {
+		var point = new Vector<Float>( 2 );
+		point[0] = x; point[1] = y; 
+		centers.push( point );	
+	}
+
+	function addFrame( key: String, x: Float, y: Float, w: Float, h: Float, cx: Float, cy: Float, srcW: Float, srcH: Float ) {
+		var id = count++;
+
+		addFrameRect( x, y, w, h );
+		addFrameCenter( x, y );
 		
-		rects.push( rect );
-		centers.push( center );
 		sourceWidth.push( srcW );
 		sourceHeight.push( srcH );
 		if ( key != null ) {
@@ -64,23 +67,16 @@ class Atlas {
 		addFrame( filename, frameData.x, frameData.y, frameData.w, frameData.h, cx, cy, frame.sourceSize.w, frame.sourceSize.h );
 	}
 
-	static public function fromTexturePackerJsonHash( data: TexturePackerJsonHash, bitmapData: BitmapData ) {
-		var self = new Atlas( bitmapData );
-		
+	public function loadTexturePackerJsonHash( data: TexturePackerJsonHash ) {
 		for ( filename in Reflect.fields( data.frames )  ) {
-			self.addTexturePackerFrame( Reflect.field( data.frames, filename ), filename );
+			addTexturePackerFrame( Reflect.field( data.frames, filename ), filename );
 		} 
-		return self;
 	}
 
-	static public function fromTexturePackerJsonArray( data: TexturePackerJsonArray, bitmapData: BitmapData ) {	
-		var self = new Atlas( bitmapData );		
-		
+	public function loadTexturePackerJsonArray( data: TexturePackerJsonArray ) {	
 		for ( frame in data.frames ) {
-		 	self.addTexturePackerFrame( frame );
+		 	addTexturePackerFrame( frame );
 		}
-
-		return self;
 	}
 
 	public function framesFromStrings( frames: Array<String> ): Array<Float> {
@@ -91,9 +87,7 @@ class Atlas {
 		framesCache[name] = framesFromStrings( frames );	
 	}
 
-	function new( bitmapData: BitmapData ) {
-		this.bitmapData = bitmapData;
-		tilesheet = new Tilesheet( bitmapData );
+	public function new() {
 		addFrame( null, 0, 0, 0, 0, 0, 0, 0, 0 );
 	}
 }

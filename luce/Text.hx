@@ -82,7 +82,7 @@ class Text extends Widget {
 		if ( args.spaceWidth != null ) {
 			spaceWidth = args.spaceWidth;
 		} else {
-			spaceWidth = batch.atlas.rects[Std.int(framesList[0])].width;
+			spaceWidth = batch.atlas.rects[Std.int(framesList[0])][2];
 		}
 
 		for ( i in 0...glyphs.length ) {
