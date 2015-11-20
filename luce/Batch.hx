@@ -3,10 +3,8 @@ package luce;
 import haxe.ds.Vector;
 
 class Batch {
-	static public inline var WGT_SIZE = 3;
 	
 	public var namedWidgets(default,null) = new Map<String,Widget>();
-	public var renderList(default,null) = new Array<Float>();
 	public var pointableList(default,null) = new List<Widget>();
 	public var pointableSet(default,null) = new Map<Int,Bool>();
 	public var atlas(default,null): Atlas;	
@@ -16,13 +14,9 @@ class Batch {
 	public var count(default,null): Int = 0;
 	public var glyphsCache(default,null) = new Map<String, Array<Float>>();
 	public var mappingsCache(default,null) = new Map<String, Map<Int,Float>>();
-	public var scissorRect(default,null): Array<Float>;
+	public var scissorRect(default,null): Array<Float> = null;
 
 	public function setCenter( x: Float, y: Float ) {
-		for ( id in 0...count ) {
-			renderList[id*WGT_SIZE] += ( x - centerX );
-			renderList[id*WGT_SIZE+1] += ( y - centerY );
-		}
 		centerX = x;
 		centerY = y;
 		dirty = true;
@@ -33,19 +27,13 @@ class Batch {
 		this.scissorRect = scissorRect;	
 	}
 
-	public inline function newWidget( args: Widget.WidgetConfig ) {
-		var shift = renderList.length;
-
-		for ( i in 0...WGT_SIZE ) {
-			renderList.push( 0 );
-		}
-			
+	public function newWidget( args: Widget.WidgetConfig ) {
 		var wgt: Widget = if ( args.text != null ) {
-			new Text( this, shift, args );
+			new Text( this, count, args );
 		} else if ( args.grid != null ) {
-			new Grid( this, shift, args );
+			new Grid( this, count, args );
 		} else {
-			new Widget( this, shift, args );
+			new Widget( this, count, args );
 		}
 
 		if ( wgt.pointable ) {
@@ -71,22 +59,13 @@ class Batch {
 		return cast newWidget( args );
 	}
 
-	public inline function getX( shift: Int )     return renderList[shift] - centerX;
-	public inline function getY( shift: Int )     return renderList[shift+1] - centerY;
-	public inline function getCX( shift: Int )    return renderList[shift];
-	public inline function getCY( shift: Int )    return renderList[shift+1];
-	public inline function getFrame( shift: Int ) return renderList[shift+2];
+	public function getX( index: Int )     return -centerX;
+	public function getY( index: Int )     return -centerY;
+	public function getFrame( index: Int ) return 0.0;
 
-	public inline function setX( shift: Int, v: Float )     setRList( shift, 0, v + centerX);
-	public inline function setY( shift: Int, v: Float )     setRList( shift, 1, v + centerY);
-	public inline function setFrame( shift: Int, v: Float ) setRList( shift, 2, v); 
-
-	inline function setRList( shift: Int, idx: Int, v: Float ) {
-		if ( renderList[shift+idx] != v ) {
-			renderList[shift+idx] = v;
-			dirty = true;	
-		}
-	}
+	public function setX( index: Int, v: Float ): Void			{}
+	public function setY( index: Int, v: Float ): Void			{}
+	public function setFrame( index: Int, v: Float ): Void	{} 
 
 	public function render() {
 		if ( !dirty ) return;
@@ -103,16 +82,16 @@ class Batch {
 	}
 
 	public inline function addPointable( w: Widget ) {
-		if ( !pointableSet.exists( w.shift )) {
+		if ( !pointableSet.exists( w.index )) {
 			pointableList.push( w );
-			pointableSet[w.shift] = true;
+			pointableSet[w.index] = true;
 		}
 	}
 
 	public inline function removePointable( w: Widget ) {
-		if ( pointableSet.exists( w.shift )) {
+		if ( pointableSet.exists( w.index )) {
 			pointableList.remove( w );
-			pointableSet.remove( w.shift );
+			pointableSet.remove( w.index );
 		}
 	}
 

@@ -37,10 +37,9 @@ class Widget implements Tween.Tweenable {
 	public var parent(default,null): Widget;
 	public var children(default,null): Array<Widget>;
 	public var hit(default,null): Array<Float> = null;
-	public var shift(default,null): Int = 0;
+	public var index(default,null): Int = 0;
 	public var batch(default,null): Batch;
 	public var onPointer(default,set): Widget->Float->Float->Int->Bool = onPointerDoNothing;
-	
 	
 	public var x(default,set)       = 0.0;	
 	public var y(default,set)       = 0.0;
@@ -100,7 +99,7 @@ class Widget implements Tween.Tweenable {
 		if ( parent != null ) {
 			xWld += parent.xWld; 
 		}
-		batch.setX( shift, xWld );
+		batch.setX( index, xWld );
 		//updateScissor();
 		if ( children != null ) {
 			for ( c in children ) {
@@ -114,7 +113,7 @@ class Widget implements Tween.Tweenable {
 		if ( parent != null ) {
 			yWld += parent.yWld; 
 		}
-		batch.setY( shift, yWld );
+		batch.setY( index, yWld );
 	//	updateScissor();
 	
 		if ( children != null ) {
@@ -140,7 +139,7 @@ class Widget implements Tween.Tweenable {
 
 	inline function updateFrameVisible() {
 		frameIdx = (visibleWld && !scissored) ? framesList[Std.int( frameWld )] : Atlas.NULL; 
-		batch.setFrame( shift, frameIdx ); 
+		batch.setFrame( index, frameIdx ); 
 	}
 
 	inline function updateFrame() {
@@ -252,9 +251,9 @@ class Widget implements Tween.Tweenable {
 		if ( args.parent != null ) setParent( args.parent );
 	}
 
-	public function new( batch: Batch, shift: Int, ?args: WidgetConfig ) {
+	public function new( batch: Batch, index: Int, ?args: WidgetConfig ) {
 		this.batch = batch;
-		this.shift = shift;
+		this.index = index;
 	 	if ( args != null ) init( args );
 	}
 }

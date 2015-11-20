@@ -5,16 +5,14 @@ import openfl.geom.Point;
 import openfl.geom.Rectangle;
 import openfl.display.BitmapData;
 
-class OpenFlBatchCopyPixels extends Batch {
+class OpenFlBatchCopyPixels extends OpenFlMinimalBatch {
 	var auxPoint = new Point( 0, 0 );
 	var zeroPoint = new Point( 0, 0 );
 	var auxRect = new Rectangle( 0, 0, 0, 0 );
 	public var buffer(default,null): BitmapData = null;
-	public var atlasFl(default,null): OpenFlAtlas;
 
 	public function new( atlas: OpenFlAtlas, scissorRect: Array<Float>, buffer: BitmapData ) {
 		super( atlas, scissorRect );
-		this.atlasFl = atlas;
 		this.buffer = buffer;
 	}
 
@@ -26,9 +24,19 @@ class OpenFlBatchCopyPixels extends Batch {
 	override public inline function render() {
 		if ( this.dirty ) {
 			this.dirty = false;
-			var shift = -Batch.WGT_SIZE;
+			var sxmin: Float = 0.0;
+			var symin: Float = 0.0;
+			var sxmax: Float = buffer.width;
+			var symax: Float = buffer.height;
+			if ( scissorRect != null ) {
+				sxmin = scissorRect[0];
+				sxmax = scissorRect[2];
+				symin = scissorRect[1];
+				symax = scissorRect[3];
+			}
+			var shift = -OpenFlMinimalBatch.WGT_SIZE;
 			for ( i in 0...this.count) {
-				shift += Batch.WGT_SIZE;
+				shift += OpenFlMinimalBatch.WGT_SIZE;
 				var id_ = this.getFrame(shift);
 				if ( id_ != Atlas.NULL ) {
 					var id = Std.int( id_ );
@@ -40,10 +48,10 @@ class OpenFlBatchCopyPixels extends Batch {
 					var ymax = ymin + rect.height;
 					auxPoint.x = xmin;
 					auxPoint.y = ymin;
-					if ( xmin >= 0 && ymin >= 0 && xmax < buffer.width && ymax < buffer.height ) {
+					if ( xmin >= 0 && ymin >= 0 && xmax < sxmax && ymax < symax ) {
 						this.buffer.copyPixels( this.atlasFl.bitmapData, rect, this.auxPoint, null, this.zeroPoint, true);							
 					} else {
-						if ( xmin < this.buffer.width && xmax >= 0 && ymin < this.buffer.height && ymax >= 0 ) {
+						if ( xmin < sxmax && xmax >= 0 && ymin < symax && ymax >= 0 ) {
 							this.auxRect.x = rect.x;
 							this.auxRect.width = rect.width;
 
@@ -53,22 +61,22 @@ class OpenFlBatchCopyPixels extends Batch {
 								this.auxRect.width += xmin;
 							}
 						
-							if ( xmax >= this.buffer.width ) {
-								this.auxRect.width -= ( xmax - this.buffer.width + 1 );
+							if ( xmax >= sxmax ) {
+								this.auxRect.width -= ( xmax - sxmax + 1 );
 							} 
 								
 							if ( this.auxRect.width >= 1.0 ) {
 								this.auxRect.y = rect.y;
 								this.auxRect.height = rect.height;
 							
-								if ( ymin < 0.0 ) {
+								if ( ymin < symin ) {
 									this.auxPoint.y = 0.0;
 									this.auxRect.y -= ymin;
 									this.auxRect.height += ymin;
-								} 
+								}
 							
-								if ( ymax >= this.buffer.height ) {
-									this.auxRect.height -= ( ymax - this.buffer.height + 1 ); 
+								if ( ymax >= symax ) {
+									this.auxRect.height -= ( ymax - symax + 1 ); 
 								}
 							
 								if ( this.auxRect.height >= 1.0 ) {
