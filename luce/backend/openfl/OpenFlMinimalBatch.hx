@@ -32,12 +32,12 @@ class OpenFlMinimalBatch extends Batch {
 		super.setCenter( centerX, centerY );
 	}
 
-	inline function attrIdx( index: Int, attr: Int ) return (index<<1)+index+attr;
+	inline function attrIdx( index: Int, attr: Int ) return WGT_SIZE*index + attr;
 	
 	override public function getX( index: Int )     return getRList( index, 0 ) - centerX;
 	override public function getY( index: Int )     return getRList( index, 1	) - centerY;
 	public function getCX( index: Int )    return getRList( index, 0 );
-	public function getCY( index: Int )    return getRList( index, 1	);
+	public function getCY( index: Int )    return getRList( index, 1 );
 	override public function getFrame( index: Int ) return getRList( index, 2 );
 
 	inline function getRList( index: Int, attr: Int ) return renderList[attrIdx( index, attr )];

@@ -24,26 +24,28 @@ class OpenFlBatchCopyPixels extends OpenFlMinimalBatch {
 	override public inline function render() {
 		if ( this.dirty ) {
 			this.dirty = false;
+			var bw = buffer.width;
+			var bh = buffer.height;
 			var sxmin: Float = 0.0;
 			var symin: Float = 0.0;
-			var sxmax: Float = buffer.width;
-			var symax: Float = buffer.height;
+			var sxmax: Float = bw;
+			var symax: Float = bh;
 			if ( scissorRect != null ) {
-				sxmin = scissorRect[0];
-				sxmax = scissorRect[2];
-				symin = scissorRect[1];
-				symax = scissorRect[3];
+				sxmin = scissorRect[0] + 0.5*bw;
+				sxmax = scissorRect[2] + 0.5*bw;
+				symin = scissorRect[1] + 0.5*bh;
+				symax = scissorRect[3] + 0.5*bh;
 			}
 			var shift = -OpenFlMinimalBatch.WGT_SIZE;
 			for ( i in 0...this.count) {
 				shift += OpenFlMinimalBatch.WGT_SIZE;
-				var id_ = this.getFrame(shift);
+				var id_ = this.getFrame(i);
 				if ( id_ != Atlas.NULL ) {
 					var id = Std.int( id_ );
 					var c = this.atlasFl.centersFl[id];
 					var rect = this.atlasFl.rectsFl[id];
-					var xmin = this.getCX( shift ) - c.x;
-					var ymin = this.getCY( shift ) - c.y;
+					var xmin = this.getCX( i ) - c.x;
+					var ymin = this.getCY( i ) - c.y;
 					var xmax = xmin + rect.width;
 					var ymax = ymin + rect.height;
 					auxPoint.x = xmin;
