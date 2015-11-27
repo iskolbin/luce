@@ -3,11 +3,11 @@ package luce;
 import haxe.ds.Vector;
 
 class Batch {
-	
+
 	public var namedWidgets(default,null) = new Map<String,Widget>();
 	public var pointableList(default,null) = new List<Widget>();
 	public var pointableSet(default,null) = new Map<Int,Bool>();
-	public var atlas(default,null): Atlas;	
+	public var atlas(default,null): Atlas;
 	public var dirty = true;
 	public var centerX(default,null): Float = 0;
 	public var centerY(default,null): Float = 0;
@@ -24,7 +24,7 @@ class Batch {
 
 	public function new( atlas: Atlas, scissorRect: Array<Float>  ) {
 		this.atlas = atlas;
-		this.scissorRect = scissorRect;	
+		this.scissorRect = scissorRect;
 	}
 
 	public function newWidget( args: Widget.WidgetConfig ) {
@@ -43,7 +43,7 @@ class Batch {
 		if ( args != null && args.name != null ) {
 			namedWidgets[args.name] = wgt;
 		}
-		
+
 		count++;
 
 		return wgt;
@@ -53,7 +53,7 @@ class Batch {
 		if ( args.text == null ) throw ".text field needed for creating text";
 		return cast newWidget( args );
 	}
-	
+
 	public function newGrid( args: Widget.WidgetConfig ): Grid {
 		if ( args.grid == null ) throw ".grid field needed for creating grid";
 		return cast newWidget( args );
@@ -65,7 +65,7 @@ class Batch {
 
 	public function setX( index: Int, v: Float ): Void			{}
 	public function setY( index: Int, v: Float ): Void			{}
-	public function setFrame( index: Int, v: Float ): Void	{} 
+	public function setFrame( index: Int, v: Float ): Void	{}
 
 	public function render() {
 		if ( !dirty ) return;
@@ -114,7 +114,8 @@ class Batch {
 	public inline static var TOUCH_8 = TOUCH_7 << 1;
 	public inline static var TOUCH_9 = TOUCH_8 << 1;
 	public inline static var TOUCH_10 = TOUCH_9 << 1;
-	
+	public inline static var CLICK = TOUCH_10 << 1;
+
 	public inline function onPointer( x: Float, y: Float, msg: Int ) {
 		for ( w in getPointablesAt( x, y )) {
 			if ( w.pointInside( x, y )) {
@@ -137,7 +138,7 @@ class Batch {
 			framesList.push( id );
 		}
 
-		glyphsCache[name] = framesList; 
+		glyphsCache[name] = framesList;
 		mappingsCache[name] = mapping;
 	}
 
