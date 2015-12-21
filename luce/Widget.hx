@@ -100,7 +100,7 @@ class Widget implements Tween.Tweenable {
 			xWld += parent.xWld; 
 		}
 		batch.setX( index, xWld );
-		//updateScissor();
+		updateScissor();
 		if ( children != null ) {
 			for ( c in children ) {
 				c.updateX();
@@ -114,8 +114,7 @@ class Widget implements Tween.Tweenable {
 			yWld += parent.yWld; 
 		}
 		batch.setY( index, yWld );
-	//	updateScissor();
-	
+		updateScissor();
 		if ( children != null ) {
 			for ( c in children ) {
 				c.updateY();
@@ -124,17 +123,19 @@ class Widget implements Tween.Tweenable {
 	}
 
 	inline function updateScissor() {
-		var frameIdx = framesList[Std.int( frameWld )];
-		var id = Std.int( frameIdx );
-		var c = batch.atlas.centers[id];
-		var rect = batch.atlas.rects[id];
-		var xmin = xWld - c[0];
-		var ymin = yWld - c[1];
-		var xmax = xmin + rect[2];
-		var ymax = ymin + rect[3];
+		if ( batch.scissorRect != null ) {
+			var frameIdx = framesList[Std.int( frameWld )];
+			var id = Std.int( frameIdx );
+			var c = batch.atlas.centers[id];
+			var rect = batch.atlas.rects[id];
+			var xmin = batch.getX( index ) - 0.5*rect[2];
+			var ymin = batch.getY( index ) - 0.5*rect[3];
+			var xmax = xmin + rect[2];
+			var ymax = ymin + rect[3];
 
-		scissored = ( xmin > batch.scissorRect[0] || xmax < batch.scissorRect[2] || ymin > batch.scissorRect[1] || ymax < batch.scissorRect[3] );
-		updateFrameVisible();
+			scissored = ( xmin > batch.scissorRect[2] || xmax < batch.scissorRect[0] || ymin > batch.scissorRect[3] || ymax < batch.scissorRect[1] );
+			updateFrameVisible();
+		}
 	}
 
 	inline function updateFrameVisible() {
