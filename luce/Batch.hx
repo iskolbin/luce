@@ -15,6 +15,18 @@ class Batch {
 	public var glyphsCache(default,null) = new Map<String, Array<Float>>();
 	public var mappingsCache(default,null) = new Map<String, Map<Int,Float>>();
 	public var scissorRect(default,null): Array<Float> = null;
+	public var pointerX(default,null): Float = 0;
+	public var pointerY(default,null): Float = 0;
+	public var pointerDx(default,null): Float = 0;
+	public var pointerDy(default,null): Float = 0;
+
+	public function setPointer( x: Float, y: Float ) {
+		pointerDx = x - pointerX;
+		pointerDy = y - pointerY;
+		pointerX = x;
+		pointerY = y;
+		onPointer( x, y, OVER );	
+	}
 
 	public function setCenter( x: Float, y: Float ) {
 		centerX = x;
@@ -115,7 +127,8 @@ class Batch {
 	public inline static var TOUCH_9 = TOUCH_8 << 1;
 	public inline static var TOUCH_10 = TOUCH_9 << 1;
 	public inline static var CLICK = TOUCH_10 << 1;
-
+	public inline static var OVER = CLICK << 1;
+	
 	public inline function onPointer( x: Float, y: Float, msg: Int ) {
 		for ( w in getPointablesAt( x, y )) {
 			if ( w.pointInside( x, y )) {
