@@ -9,6 +9,6 @@
 	"contributors": ["iskolbin"],
 	"dependencies": {
 		"junge": "",
-		"openfl": "",
+		"openfl": ""
 	}
 }
