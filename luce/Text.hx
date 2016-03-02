@@ -109,7 +109,7 @@ class Text extends Widget {
 
 	function updateGlyphs() {
 		var x0: Float = switch ( align ) {
-			case Center: -totalWidth / 2; 
+			case Center: -Math.ffloor( 0.5 * totalWidth ); 
 			case Left: 0;
 			case Right: -totalWidth;
 			default: 0;
@@ -120,7 +120,6 @@ class Text extends Widget {
 			var hw = 0.5*getGlyphWidth( i );
 			w += hw;
 			glyphs[i].x = w + x0;
-			//Math.floor( w + x0 );
 
 			w += hw;
 			w += tracking;
