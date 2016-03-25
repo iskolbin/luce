@@ -72,9 +72,12 @@ class Text extends Widget {
 		} else if ( args.frames != null ) {
 			framesList = batch.newFramesList( args.frames );
 		} else if ( args.cached != null ) {
+			if ( !batch.glyphsCache.exists( args.cached ))
+				throw 'Cached glyphs "${args.cached}" not exist!';
+			if ( !batch.mappingsCache.exists( args.cached ))
+				throw 'Cached mapping "${args.cached}" not exist!'; 
 			framesList = batch.glyphsCache[args.cached];
 			mapping = batch.mappingsCache[args.cached];
-			
 		} else {
 			throw "Cannot create text: need .mapping and .frame/.framesList or .cached";
 		}

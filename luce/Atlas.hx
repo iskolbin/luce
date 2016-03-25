@@ -1,9 +1,10 @@
 package luce;
 
 import haxe.ds.Vector;
+import haxe.macro.Expr;
+import haxe.macro.Context;
 
 typedef TexturePackerJsonFrame = {
-	?filename: String,
 	frame: {x: Int, y: Int, w: Int, h: Int},
 	rotated: Bool,
 	trimmed: Bool,
@@ -14,10 +15,6 @@ typedef TexturePackerJsonFrame = {
 
 typedef TexturePackerJsonHash = {
 	frames: Dynamic,
-}
-
-typedef TexturePackerJsonArray = {
-	frames: Array<TexturePackerJsonFrame>
 }
 
 class Atlas {
@@ -45,7 +42,7 @@ class Atlas {
 		centers.push( point );	
 	}
 
-	function addFrame( key: String, x: Float, y: Float, w: Float, h: Float, cx: Float, cy: Float, srcW: Float, srcH: Float ) {
+	public function addFrame( key: String, x: Float, y: Float, w: Float, h: Float, cx: Float, cy: Float, srcW: Float, srcH: Float ) {
 		var id = count++;
 
 		addFrameRect( x, y, w, h );
@@ -58,8 +55,7 @@ class Atlas {
 		}
 	}
 
-	function addTexturePackerFrame( frame: TexturePackerJsonFrame, ?filename: String ) {
-		var filename = filename == null ? frame.filename : filename;
+	function addTexturePackerFrame( frame: TexturePackerJsonFrame, filename: String ) {
 		var frameData = frame.frame;
 		var cx = frame.trimmed ? ( 0.5*frame.sourceSize.w - frame.spriteSourceSize.x ) : 0.5*frame.sourceSize.w;
 		var cy = frame.trimmed ? ( 0.5*frame.sourceSize.h - frame.spriteSourceSize.y ) : 0.5*frame.sourceSize.h;
@@ -73,12 +69,6 @@ class Atlas {
 		} 
 	}
 
-	public function loadTexturePackerJsonArray( data: TexturePackerJsonArray ) {	
-		for ( frame in data.frames ) {
-		 	addTexturePackerFrame( frame );
-		}
-	}
-
 	public function framesFromStrings( frames: Array<String> ): Array<Float> {
 		return [ for ( f in frames ) ids[f] ];
 	}
@@ -89,5 +79,22 @@ class Atlas {
 
 	public function new() {
 		addFrame( null, 0, 0, 0, 0, 0, 0, 0, 0 );
+	}
+	
+	macro public static function unrollTexturePackerHashJson( atlas: ExprOf<Atlas>, path: String ) {
+		var data = haxe.Json.parse( sys.io.File.getContent( path ));
+		var toadd = new Array<Expr>();
+		for ( filename in Reflect.fields( data.frames  )) {
+			var frame: TexturePackerJsonFrame = Reflect.field( data.frames, filename );
+			var frameData = frame.frame;
+			var cx = frame.trimmed ? ( 0.5*frame.sourceSize.w - frame.spriteSourceSize.x ) : 0.5*frame.sourceSize.w;
+			var cy = frame.trimmed ? ( 0.5*frame.sourceSize.h - frame.spriteSourceSize.y ) : 0.5*frame.sourceSize.h;
+
+			toadd.push( macro {${atlas}.addFrame( 
+					$v{filename}, 
+					$v{frameData.x}, $v{frameData.y}, $v{frameData.w}, $v{frameData.h}, 
+					$v{cx}, $v{cy}, $v{frame.sourceSize.w}, $v{frame.sourceSize.h});});
+		}
+		return macro $b{toadd};
 	}
 }
