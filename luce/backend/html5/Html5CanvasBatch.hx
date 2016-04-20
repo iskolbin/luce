@@ -61,6 +61,7 @@ class Html5CanvasBatch extends Batch {
 	}
 	
 	override public inline function clear() {
+		this.dirty = true;
 		context.clearRect( 0, 0, context.canvas.width, context.canvas.height );	
 	}
 
@@ -82,13 +83,13 @@ class Html5CanvasBatch extends Batch {
 			var shift = -WGT_SIZE;
 			for ( i in 0...this.count) {
 				shift += WGT_SIZE;
-				var id_ = this.getFrame(i);
+				var id_ = renderList[shift+2];
 				if ( id_ != Atlas.NULL ) {
 					var id = Std.int( id_ );
 					var c = this.atlas.centers[id];
 					var rect = this.atlas.rects[id];
-					var xmin = this.getCX( i ) - c[0];
-					var ymin = this.getCY( i ) - c[1];
+					var xmin = renderList[shift] - c[0];
+					var ymin = renderList[shift+1] - c[1];
 					var xmax = xmin + rect[2];
 					var ymax = ymin + rect[3];
 					var auxPointX = xmin;

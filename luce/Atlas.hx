@@ -46,7 +46,7 @@ class Atlas {
 		var id = count++;
 
 		addFrameRect( x, y, w, h );
-		addFrameCenter( x, y );
+		addFrameCenter( cx, cy );
 		
 		sourceWidth.push( srcW );
 		sourceHeight.push( srcH );
