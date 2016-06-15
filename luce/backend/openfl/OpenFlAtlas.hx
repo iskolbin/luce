@@ -1,5 +1,6 @@
 package luce.backend.openfl;
 
+#if openfl
 import luce.Atlas;
 import openfl.display.Tilesheet;
 import openfl.display.BitmapData;
@@ -27,3 +28,4 @@ class OpenFlAtlas extends Atlas {
 		super();
 	}
 }
+#end

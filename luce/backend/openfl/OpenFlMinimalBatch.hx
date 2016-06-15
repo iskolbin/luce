@@ -1,5 +1,6 @@
 package luce.backend.openfl;
 
+#if openfl
 import luce.Batch;
 import luce.Widget;
 
@@ -54,3 +55,4 @@ class OpenFlMinimalBatch extends Batch {
 		}
 	}
 }
+#end

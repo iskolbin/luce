@@ -3,12 +3,11 @@
 	"url" : "https://github.com/iskolbin/luce",
 	"license": "MIT",
 	"tags": ["openfl"],
-	"description": "Luce is minimal OpenFL drawing library based mainly on drawTiles method of the Tilesheet class.",
-	"version": "0.6.2",
-	"releasenote": "Added compile time atlas loading from JSON for TexturePacker. Added additional checks to Text",
+	"description": "Luce is minimal drawing library",
+	"version": "0.8.0",
+	"releasenote": "Added kha renderer, guarded external renderers, external dependencies are optional",
 	"contributors": ["iskolbin"],
 	"dependencies": {
-		"junge": "",
-		"openfl": ""
+		"junge": ""
 	}
 }

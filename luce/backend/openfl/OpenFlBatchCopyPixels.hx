@@ -1,5 +1,6 @@
 package luce.backend.openfl;
 
+#if openfl
 import luce.Batch;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
@@ -92,3 +93,4 @@ class OpenFlBatchCopyPixels extends OpenFlMinimalBatch {
 		}
 	}
 }
+#end

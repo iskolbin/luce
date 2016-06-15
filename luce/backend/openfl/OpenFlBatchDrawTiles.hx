@@ -1,5 +1,6 @@
 package luce.backend.openfl;
 
+#if openfl
 import luce.Batch;
 import openfl.display.Graphics;
 
@@ -20,3 +21,4 @@ class OpenFlBatchDrawTiles extends OpenFlMinimalBatch {
 		this.atlasFl.tilesheet.drawTiles( this.graphics, this.renderList, this.smooth, 0 );	
 	}	
 }
+#end
