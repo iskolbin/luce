@@ -4,8 +4,8 @@
 	"license": "MIT",
 	"tags": ["openfl"],
 	"description": "Luce is minimal drawing library",
-	"version": "0.8.0",
-	"releasenote": "Added kha renderer, guarded external renderers, external dependencies are optional",
+	"version": "0.8.1",
+	"releasenote": "Added openfl tilemap renderer",
 	"contributors": ["iskolbin"],
 	"dependencies": {
 		"junge": ""
