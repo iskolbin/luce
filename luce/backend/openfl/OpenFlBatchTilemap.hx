@@ -7,7 +7,7 @@ import openfl.display.Tile;
 import openfl.display.Tileset;
 import luce.Batch;
 
-class OpenFlBatchTilemap extends Batch {
+class OpenFlBatchTilemap extends OpenFlMinimalBatch {
 	public var layer: TilemapLayer;
 	public var tilemap: Tilemap;
 	public var tileset: Tileset;
@@ -26,10 +26,11 @@ class OpenFlBatchTilemap extends Batch {
 	}
 
 	override public function newWidget( args: Widget.WidgetConfig ) {
-		tiles.push( new Tile( 0, 0, 0 ));
+		var tile = new Tile( 0, 0, 0 );
+		tiles.push( tile );
+		layer.addTile( tile );
 		return super.newWidget( args );
 	}
-	
 	override public function setCenter( centerX: Float, centerY: Float ) {
 		for ( tile in tiles ) {
 			tile.x += centerX - this.centerX;
@@ -38,11 +39,20 @@ class OpenFlBatchTilemap extends Batch {
 		super.setCenter( centerX, centerY );
 	}
 
-	override public function getX( index: Int ) return tiles[index].x;
-	override public function getY( index: Int ) return tiles[index].y;
-	override public function getFrame( index: Int ): Float return tiles[index].id;
+	override inline public function setX( index: Int, v: Float )  { 
+		super.setX( index, v ); 
+		tiles[index].x = getRList( index, 0 ) - atlas.centers[tiles[index].id][0];
+	}
+	
+	override inline public function setY( index: Int, v: Float )  { 
+		super.setY( index, v ); 
+		tiles[index].y = getRList( index, 1 ) - atlas.centers[tiles[index].id][1];
+	}
 
-	override public function setX( index: Int, v: Float )  tiles[index].x = v + centerX;
-	override public function setY( index: Int, v: Float )  tiles[index].y = v + centerY;
-	override public function setFrame( index: Int, v: Float ) tiles[index].id = Std.int(v);
+	override inline public function setFrame( index: Int, v: Float )  { 
+		super.setFrame( index, v ); 
+		tiles[index].id = Std.int( v );
+		tiles[index].x = getRList( index, 0 ) - atlas.centers[tiles[index].id][0];
+		tiles[index].y = getRList( index, 1 ) - atlas.centers[tiles[index].id][1];
+	}
 }
