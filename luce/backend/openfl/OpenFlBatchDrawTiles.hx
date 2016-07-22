@@ -1,6 +1,7 @@
 package luce.backend.openfl;
 
 #if openfl
+#if (openfl < "4.0.0")
 import luce.Batch;
 import openfl.display.Graphics;
 
@@ -21,4 +22,7 @@ class OpenFlBatchDrawTiles extends OpenFlMinimalBatch {
 		this.atlasFl.tilesheet.drawTiles( this.graphics, this.renderList, this.smooth, 0 );	
 	}	
 }
+#else
+#error "openfl.display.Tilesheet is deprecated since OpenFl 4+, so drawTiles method is unusable"
+#end
 #end

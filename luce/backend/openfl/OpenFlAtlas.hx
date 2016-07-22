@@ -1,14 +1,12 @@
 package luce.backend.openfl;
 
-#if openfl
 import luce.Atlas;
-import openfl.display.Tilesheet;
 import openfl.display.BitmapData;
 import openfl.geom.Rectangle;
 import openfl.geom.Point;
 
 class OpenFlAtlas extends Atlas {
-	public var tilesheet(default,null): Tilesheet;
+	#if (openfl < "4.0.0") public var tilesheet(default,null): openfl.display.Tilesheet; #end
 	public var bitmapData(default,null): BitmapData;
 	public var rectsFl(default,null) = new Array<Rectangle>();
 	public var centersFl(default,null) = new Array<Point>();
@@ -19,13 +17,12 @@ class OpenFlAtlas extends Atlas {
 		var center = new Point( cx, cy );
 		rectsFl.push( rect );
 		centersFl.push( center );
-		tilesheet.addTileRect( rect, center );
+		#if (openfl < "4.0.0") tilesheet.addTileRect( rect, center ); #end
 	}
 
 	public function new( bitmapData: BitmapData ) {
 		this.bitmapData = bitmapData;
-		this.tilesheet = new Tilesheet( bitmapData );
+		#if (openfl < "4.0.0") this.tilesheet = new Tilesheet( bitmapData ); #end
 		super();
 	}
 }
-#end

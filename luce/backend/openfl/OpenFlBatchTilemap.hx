@@ -1,14 +1,12 @@
 package luce.backend.openfl;
 
 import openfl.display.Sprite;
-import openfl.display.TilemapLayer;
 import openfl.display.Tilemap;
 import openfl.display.Tile;
 import openfl.display.Tileset;
 import luce.Batch;
 
 class OpenFlBatchTilemap extends OpenFlMinimalBatch {
-	public var layer: TilemapLayer;
 	public var tilemap: Tilemap;
 	public var tileset: Tileset;
 	public var tiles = new Array<Tile>();
@@ -19,16 +17,19 @@ class OpenFlBatchTilemap extends OpenFlMinimalBatch {
 		for ( i in 0...atlas.rectsFl.length ) {
 			tileset.addRect( atlas.rectsFl[i] );
 		}
-		layer = new TilemapLayer( tileset );
-		tilemap = new Tilemap( host.stage.stageWidth, host.stage.stageHeight );
-		tilemap.addLayer( layer );
+		if ( scissorRect == null ) {
+			tilemap = new Tilemap( host.stage.stageWidth, host.stage.stageHeight, tileset );
+		} else {
+			trace( '${Std.int(scissorRect[2] - scissorRect[0])} ${Std.int(scissorRect[3] - scissorRect[1])}' );
+			tilemap = new Tilemap( Std.int(scissorRect[2] - scissorRect[0]), Std.int(scissorRect[3] - scissorRect[1]), tileset );
+		}
 		host.addChild( tilemap );
 	}
 
 	override public function newWidget( args: Widget.WidgetConfig ) {
 		var tile = new Tile( 0, 0, 0 );
 		tiles.push( tile );
-		layer.addTile( tile );
+		tilemap.addTile( tile );
 		return super.newWidget( args );
 	}
 	override public function setCenter( centerX: Float, centerY: Float ) {

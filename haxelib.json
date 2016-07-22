@@ -2,10 +2,10 @@
 	"name": "luce",
 	"url" : "https://github.com/iskolbin/luce",
 	"license": "MIT",
-	"tags": ["openfl"],
+	"tags": ["openfl","kha"],
 	"description": "Luce is minimal drawing library",
-	"version": "0.8.1",
-	"releasenote": "Added openfl tilemap renderer",
+	"version": "0.8.2",
+	"releasenote": "Updated OpenFl renderers for OpenFl 4.0.1",
 	"contributors": ["iskolbin"],
 	"dependencies": {
 		"junge": ""
