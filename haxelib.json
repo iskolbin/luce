@@ -4,8 +4,8 @@
 	"license": "MIT",
 	"tags": ["openfl","kha"],
 	"description": "Luce is minimal drawing library",
-	"version": "0.8.2",
-	"releasenote": "Updated OpenFl renderers for OpenFl 4.0.1",
+	"version": "0.8.3",
+	"releasenote": "Cleanup",
 	"contributors": ["iskolbin"],
 	"dependencies": {
 		"junge": ""
