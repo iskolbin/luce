@@ -20,7 +20,6 @@ class OpenFlBatchTilemap extends OpenFlMinimalBatch {
 		if ( scissorRect == null ) {
 			tilemap = new Tilemap( host.stage.stageWidth, host.stage.stageHeight, tileset );
 		} else {
-			trace( '${Std.int(scissorRect[2] - scissorRect[0])} ${Std.int(scissorRect[3] - scissorRect[1])}' );
 			tilemap = new Tilemap( Std.int(scissorRect[2] - scissorRect[0]), Std.int(scissorRect[3] - scissorRect[1]), tileset );
 		}
 		host.addChild( tilemap );
