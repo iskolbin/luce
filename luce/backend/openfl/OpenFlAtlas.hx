@@ -22,7 +22,7 @@ class OpenFlAtlas extends Atlas {
 
 	public function new( bitmapData: BitmapData ) {
 		this.bitmapData = bitmapData;
-		#if (openfl < "4.0.0") this.tilesheet = new Tilesheet( bitmapData ); #end
+		#if (openfl < "4.0.0") this.tilesheet = new openfl.display.Tilesheet( bitmapData ); #end
 		super();
 	}
 }
