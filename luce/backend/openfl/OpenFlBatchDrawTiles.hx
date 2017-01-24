@@ -4,13 +4,14 @@ package luce.backend.openfl;
 #if (openfl < "4.0.0")
 import luce.Batch;
 import openfl.display.Graphics;
+import openfl.display.DisplayObjectContainer;
 
 class OpenFlBatchDrawTiles extends OpenFlMinimalBatch {
 	public var graphics(default,null): Graphics;
 	public var smooth: Bool = true;
 
-	public function new( atlas: OpenFlAtlas, scissorRect: Array<Float>, graphics: Graphics ) {
-		super( atlas, scissorRect );
+	public function new( atlas: OpenFlAtlas, scissorRect: Array<Float>, graphics: Graphics, parent: DisplayObjectContainer ) {
+		super( atlas, scissorRect, parent );
 		this.graphics = graphics;
 	}
 

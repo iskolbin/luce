@@ -5,6 +5,7 @@ import luce.Batch;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 import openfl.display.BitmapData;
+import openfl.display.DisplayObjectContainer;
 
 class OpenFlBatchCopyPixels extends OpenFlMinimalBatch {
 	var auxPoint = new Point( 0, 0 );
@@ -12,8 +13,8 @@ class OpenFlBatchCopyPixels extends OpenFlMinimalBatch {
 	var auxRect = new Rectangle( 0, 0, 0, 0 );
 	public var buffer(default,null): BitmapData = null;
 
-	public function new( atlas: OpenFlAtlas, scissorRect: Array<Float>, buffer: BitmapData ) {
-		super( atlas, scissorRect );
+	public function new( atlas: OpenFlAtlas, scissorRect: Array<Float>, buffer: BitmapData, parent: DisplayObjectContainer ) {
+		super( atlas, scissorRect, parent );
 		this.buffer = buffer;
 	}
 

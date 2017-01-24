@@ -12,7 +12,7 @@ class OpenFlBatchTilemap extends OpenFlMinimalBatch {
 	public var tiles = new Array<Tile>();
 
 	public function new( atlas: OpenFlAtlas, scissorRect: Array<Float>, host: Sprite ) {
-		super( atlas, scissorRect );
+		super( atlas, scissorRect, host );
 		tileset = new Tileset( atlas.bitmapData );
 		for ( i in 0...atlas.rectsFl.length ) {
 			tileset.addRect( atlas.rectsFl[i] );

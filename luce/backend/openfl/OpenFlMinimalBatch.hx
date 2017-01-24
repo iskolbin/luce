@@ -3,16 +3,19 @@ package luce.backend.openfl;
 #if openfl
 import luce.Batch;
 import luce.Widget;
+import openfl.display.DisplayObjectContainer;
 
 class OpenFlMinimalBatch extends Batch {
 	public var atlasFl: OpenFlAtlas;
 	public var renderList(default,null) = new Array<Float>();
-	
+	public var parentFl: DisplayObjectContainer;
+
 	static public inline var WGT_SIZE = 3;
 	
-	public function new( atlas: OpenFlAtlas, scissorRect: Array<Float> ) {
+	public function new( atlas: OpenFlAtlas, scissorRect: Array<Float>, ?parent: DisplayObjectContainer ) {
 		super( atlas, scissorRect );
-		this.atlasFl = atlas;	
+		this.atlasFl = atlas;
+		this.parentFl = parent;
 	}
 
 	override public function newWidget( args: Widget.WidgetConfig ) {

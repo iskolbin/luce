@@ -4,8 +4,8 @@
 	"license": "MIT",
 	"tags": ["openfl","kha"],
 	"description": "Luce is minimal drawing library",
-	"version": "0.8.4",
-	"releasenote": "Fix OpenFl 3 draw tiles renderer",
+	"version": "0.9.0",
+	"releasenote": "Added parent property to OpenFl batches",
 	"contributors": ["iskolbin"],
 	"dependencies": {
 		"junge": ""
