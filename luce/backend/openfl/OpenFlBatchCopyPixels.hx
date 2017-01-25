@@ -13,7 +13,7 @@ class OpenFlBatchCopyPixels extends OpenFlMinimalBatch {
 	var auxRect = new Rectangle( 0, 0, 0, 0 );
 	public var buffer(default,null): BitmapData = null;
 
-	public function new( atlas: OpenFlAtlas, scissorRect: Array<Float>, buffer: BitmapData, parent: DisplayObjectContainer ) {
+	public function new( atlas: OpenFlAtlas, scissorRect: Array<Float>, buffer: BitmapData, ?parent: DisplayObjectContainer ) {
 		super( atlas, scissorRect, parent );
 		this.buffer = buffer;
 	}

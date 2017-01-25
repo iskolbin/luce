@@ -10,7 +10,7 @@ class OpenFlBatchDrawTiles extends OpenFlMinimalBatch {
 	public var graphics(default,null): Graphics;
 	public var smooth: Bool = true;
 
-	public function new( atlas: OpenFlAtlas, scissorRect: Array<Float>, graphics: Graphics, parent: DisplayObjectContainer ) {
+	public function new( atlas: OpenFlAtlas, scissorRect: Array<Float>, graphics: Graphics, ?parent: DisplayObjectContainer ) {
 		super( atlas, scissorRect, parent );
 		this.graphics = graphics;
 	}
