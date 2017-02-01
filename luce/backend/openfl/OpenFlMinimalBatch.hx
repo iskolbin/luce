@@ -3,19 +3,26 @@ package luce.backend.openfl;
 #if openfl
 import luce.Batch;
 import luce.Widget;
-import openfl.display.DisplayObjectContainer;
+import openfl.display.Sprite;
 
 class OpenFlMinimalBatch extends Batch {
 	public var atlasFl: OpenFlAtlas;
 	public var renderList(default,null) = new Array<Float>();
-	public var parentFl: DisplayObjectContainer;
+	public var parent: Sprite;
 
+	public var smooth(get,set): Bool;
+ 
+	var smoothing = true;
+
+	public function get_smooth() return this.smoothing;
+	public function set_smooth( v ) return this.smoothing = v;
+	
 	static public inline var WGT_SIZE = 3;
 	
-	public function new( atlas: OpenFlAtlas, scissorRect: Array<Float>, ?parent: DisplayObjectContainer ) {
+	public function new( atlas: OpenFlAtlas, scissorRect: Array<Float>, parent: Sprite ) {
 		super( atlas, scissorRect );
 		this.atlasFl = atlas;
-		this.parentFl = parent;
+		this.parent = parent;
 	}
 
 	override public function newWidget( args: Widget.WidgetConfig ) {

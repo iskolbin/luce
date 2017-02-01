@@ -11,18 +11,23 @@ class OpenFlBatchTilemap extends OpenFlMinimalBatch {
 	public var tileset: Tileset;
 	public var tiles = new Array<Tile>();
 
-	public function new( atlas: OpenFlAtlas, scissorRect: Array<Float>, host: Sprite ) {
-		super( atlas, scissorRect, host );
+	override public inline function set_smooth( v ) {
+		tilemap.smoothing = v;
+		return super.set_smooth( v );
+	}
+
+	public function new( atlas: OpenFlAtlas, scissorRect: Array<Float>, parent: Sprite ) {
+		super( atlas, scissorRect, parent );
 		tileset = new Tileset( atlas.bitmapData );
 		for ( i in 0...atlas.rectsFl.length ) {
 			tileset.addRect( atlas.rectsFl[i] );
 		}
 		if ( scissorRect == null ) {
-			tilemap = new Tilemap( host.stage.stageWidth, host.stage.stageHeight, tileset );
+			tilemap = new Tilemap( parent.stage.stageWidth, parent.stage.stageHeight, tileset );
 		} else {
 			tilemap = new Tilemap( Std.int(scissorRect[2] - scissorRect[0]), Std.int(scissorRect[3] - scissorRect[1]), tileset );
 		}
-		host.addChild( tilemap );
+		parent.addChild( tilemap );
 	}
 
 	override public function newWidget( args: Widget.WidgetConfig ) {

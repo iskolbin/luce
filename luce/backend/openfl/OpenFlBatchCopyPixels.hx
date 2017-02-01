@@ -4,18 +4,31 @@ package luce.backend.openfl;
 import luce.Batch;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
+import openfl.display.Bitmap;
 import openfl.display.BitmapData;
-import openfl.display.DisplayObjectContainer;
+import openfl.display.Sprite;
 
 class OpenFlBatchCopyPixels extends OpenFlMinimalBatch {
 	var auxPoint = new Point( 0, 0 );
 	var zeroPoint = new Point( 0, 0 );
 	var auxRect = new Rectangle( 0, 0, 0, 0 );
-	public var buffer(default,null): BitmapData = null;
+	public var buffer(default,null): BitmapData;
+	public var proxy(default,null): Bitmap;
 
-	public function new( atlas: OpenFlAtlas, scissorRect: Array<Float>, buffer: BitmapData, ?parent: DisplayObjectContainer ) {
+	override public inline function set_smooth( v ) {
+		proxy.smoothing = v;
+		return super.set_smooth( v );
+	}
+
+	public function new( atlas: OpenFlAtlas, scissorRect: Array<Float>, parent: Sprite, ?width: Int = 0, ?height: Int = 0 ) {
 		super( atlas, scissorRect, parent );
-		this.buffer = buffer;
+		if ( parent.stage != null ) {
+			buffer = new BitmapData( parent.stage.stageWidth, parent.stage.stageHeight, false, 0 );
+		} else {
+			buffer = new BitmapData( width, height, false, 0 );
+		}
+		proxy = new Bitmap( buffer );
+		parent.addChild( proxy );
 	}
 
 	override public inline function clear() {
@@ -25,6 +38,10 @@ class OpenFlBatchCopyPixels extends OpenFlMinimalBatch {
 
 	override public inline function render() {
 		if ( this.dirty ) {
+			var auxPoint = this.auxPoint;
+			var zeroPoint = this.zeroPoint;
+			var auxRect = this.auxRect;
+			var buffer = this.buffer;
 			this.dirty = false;
 			var bw = buffer.width;
 			var bh = buffer.height;
@@ -39,13 +56,16 @@ class OpenFlBatchCopyPixels extends OpenFlMinimalBatch {
 				symax = scissorRect[3] + 0.5*bh;
 			}
 			var shift = -OpenFlMinimalBatch.WGT_SIZE;
+			var centers = atlasFl.centersFl;
+			var rects = atlasFl.rectsFl;
+			var bitmapData = atlasFl.bitmapData;
 			for ( i in 0...this.count) {
 				shift += OpenFlMinimalBatch.WGT_SIZE;
 				var id_ = this.getFrame(i);
 				if ( id_ != Atlas.NULL ) {
 					var id = Std.int( id_ );
-					var c = this.atlasFl.centersFl[id];
-					var rect = this.atlasFl.rectsFl[id];
+					var c = centers[id];
+					var rect = rects[id];
 					var xmin = this.getCX( i ) - c.x;
 					var ymin = this.getCY( i ) - c.y;
 					var xmax = xmin + rect.width;
@@ -53,38 +73,38 @@ class OpenFlBatchCopyPixels extends OpenFlMinimalBatch {
 					auxPoint.x = xmin;
 					auxPoint.y = ymin;
 					if ( xmin >= 0 && ymin >= 0 && xmax < sxmax && ymax < symax ) {
-						this.buffer.copyPixels( this.atlasFl.bitmapData, rect, this.auxPoint, null, this.zeroPoint, true);							
+						buffer.copyPixels( bitmapData, rect, auxPoint, null, zeroPoint, true);							
 					} else {
 						if ( xmin < sxmax && xmax >= 0 && ymin < symax && ymax >= 0 ) {
-							this.auxRect.x = rect.x;
-							this.auxRect.width = rect.width;
+							auxRect.x = rect.x;
+							auxRect.width = rect.width;
 
 							if ( xmin < 0.0 ) {
-								this.auxPoint.x = 0;
-								this.auxRect.x -= xmin;
-								this.auxRect.width += xmin;
+								auxPoint.x = 0;
+								auxRect.x -= xmin;
+								auxRect.width += xmin;
 							}
 						
 							if ( xmax >= sxmax ) {
-								this.auxRect.width -= ( xmax - sxmax + 1 );
+								auxRect.width -= ( xmax - sxmax + 1 );
 							} 
 								
-							if ( this.auxRect.width >= 1.0 ) {
-								this.auxRect.y = rect.y;
-								this.auxRect.height = rect.height;
+							if ( auxRect.width >= 1.0 ) {
+								auxRect.y = rect.y;
+								auxRect.height = rect.height;
 							
 								if ( ymin < symin ) {
-									this.auxPoint.y = 0.0;
-									this.auxRect.y -= ymin;
-									this.auxRect.height += ymin;
+									auxPoint.y = 0.0;
+									auxRect.y -= ymin;
+									auxRect.height += ymin;
 								}
 							
 								if ( ymax >= symax ) {
-									this.auxRect.height -= ( ymax - symax + 1 ); 
+									auxRect.height -= ( ymax - symax + 1 ); 
 								}
 							
-								if ( this.auxRect.height >= 1.0 ) {
-									this.buffer.copyPixels( this.atlasFl.bitmapData, this.auxRect, this.auxPoint, null, this.zeroPoint, true );
+								if ( auxRect.height >= 1.0 ) {
+									buffer.copyPixels( bitmapData, auxRect, auxPoint, null, zeroPoint, true );
 								}
 							}
 						}

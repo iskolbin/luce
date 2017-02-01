@@ -19,7 +19,7 @@ class Batch {
 	public var pointerY(default,null): Float = 0;
 	public var pointerDx(default,null): Float = 0;
 	public var pointerDy(default,null): Float = 0;
-
+	
 	public function setPointer( x: Float, y: Float ) {
 		pointerDx = x - pointerX;
 		pointerDy = y - pointerY;

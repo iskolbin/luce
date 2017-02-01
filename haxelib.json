@@ -2,10 +2,10 @@
 	"name": "luce",
 	"url" : "https://github.com/iskolbin/luce",
 	"license": "MIT",
-	"tags": ["openfl","kha"],
+	"tags": ["openfl","kha","canvas"],
 	"description": "Luce is minimal drawing library",
-	"version": "0.9.1",
-	"releasenote": "Make parent property optional in OpenFl batches",
+	"version": "0.10.0",
+	"releasenote": "Major rewrite of parents for OpenFl batches, added smoothing support for all OpenFl batches, breaking changes!",
 	"contributors": ["iskolbin"],
 	"dependencies": {
 		"junge": ""
