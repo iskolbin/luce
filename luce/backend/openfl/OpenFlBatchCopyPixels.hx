@@ -15,9 +15,9 @@ class OpenFlBatchCopyPixels extends OpenFlMinimalBatch {
 	public var buffer(default,null): BitmapData;
 	public var proxy(default,null): Bitmap;
 
-	override public inline function set_smooth( v ) {
+	override public inline function set_smoothing( v ) {
 		proxy.smoothing = v;
-		return super.set_smooth( v );
+		return super.set_smoothing( v );
 	}
 
 	public function new( atlas: OpenFlAtlas, scissorRect: Array<Float>, parent: Sprite, ?width: Int = 0, ?height: Int = 0 ) {

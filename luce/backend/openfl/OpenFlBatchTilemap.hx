@@ -11,9 +11,9 @@ class OpenFlBatchTilemap extends OpenFlMinimalBatch {
 	public var tileset: Tileset;
 	public var tiles = new Array<Tile>();
 
-	override public inline function set_smooth( v ) {
+	override public inline function set_smoothing( v ) {
 		tilemap.smoothing = v;
-		return super.set_smooth( v );
+		return super.set_smoothing( v );
 	}
 
 	public function new( atlas: OpenFlAtlas, scissorRect: Array<Float>, parent: Sprite ) {

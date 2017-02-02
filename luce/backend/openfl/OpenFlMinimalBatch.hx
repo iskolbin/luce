@@ -9,13 +9,10 @@ class OpenFlMinimalBatch extends Batch {
 	public var atlasFl: OpenFlAtlas;
 	public var renderList(default,null) = new Array<Float>();
 	public var parent: Sprite;
+	public var smoothing(default,set) = false;
 
-	public var smooth(get,set): Bool;
- 
-	var smoothing = true;
-
-	public function get_smooth() return this.smoothing;
-	public function set_smooth( v ) return this.smoothing = v;
+	public function get_smoothing() return this.smoothing;
+	public function set_smoothing( v ) return this.smoothing = v;
 	
 	static public inline var WGT_SIZE = 3;
 	
