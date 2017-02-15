@@ -20,15 +20,25 @@ class OpenFlBatchCopyPixels extends OpenFlMinimalBatch {
 		return super.set_smoothing( v );
 	}
 
-	public function new( atlas: OpenFlAtlas, scissorRect: Array<Float>, parent: Sprite, ?width: Int = 0, ?height: Int = 0 ) {
+	public function new( atlas: OpenFlAtlas, scissorRect: Array<Float>, parent: Sprite, ?prevProxy: Bitmap ) {
 		super( atlas, scissorRect, parent );
-		if ( parent.stage != null ) {
-			buffer = new BitmapData( parent.stage.stageWidth, parent.stage.stageHeight, false, 0 );
+		if ( prevProxy != null ) {
+			proxy = prevProxy;
+			buffer = prevProxy.bitmapData;
 		} else {
-			buffer = new BitmapData( width, height, false, 0 );
+			if ( scissorRect != null ) {
+				var width = scissorRect[2] - scissorRect[0];
+				var height = scissorRect[3] - scissorRect[1];
+				buffer = new BitmapData( Std.int(width), Std.int(height), false, 0 );
+			} else if ( parent.stage != null ) {
+				buffer = new BitmapData( parent.stage.stageWidth, parent.stage.stageHeight, false, 0 );
+			} else {
+				throw "Specify scissorRect";
+			}
+			proxy = new Bitmap( buffer );
+			proxy.smoothing = true;
+			parent.addChild( proxy );
 		}
-		proxy = new Bitmap( buffer );
-		parent.addChild( proxy );
 	}
 
 	override public inline function clear() {
