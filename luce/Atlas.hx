@@ -20,7 +20,7 @@ typedef TexturePackerJsonHash = {
 class Atlas {
 	public var ids(default,null) = new Map<String, Float>();
 	public var rects(default,null) = new Array<Vector<Float>>();
-	public var sourceRects(default,null) = new Array<Vector<Float>>()
+	public var sourceRects(default,null) = new Array<Vector<Float>>();
 	public var centers(default,null) = new Array<Vector<Float>>();
 	public var sourceWidth(default,null) = new Array<Float>();
 	public var sourceHeight(default,null) = new Array<Float>();
