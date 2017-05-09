@@ -68,7 +68,7 @@ class Atlas {
 		var cx = frame.trimmed ? ( 0.5*frame.sourceSize.w - frame.spriteSourceSize.x ) : 0.5*frame.sourceSize.w;
 		var cy = frame.trimmed ? ( 0.5*frame.sourceSize.h - frame.spriteSourceSize.y ) : 0.5*frame.sourceSize.h;
 
-		addFrame( filename, frameData.x, frameData.y, frameData.w, frameData.h, cx, cy, frame.sourceSize.x, frame.sourceSize.y, frame.sourceSize.w, frame.sourceSize.h );
+		addFrame( filename, frameData.x, frameData.y, frameData.w, frameData.h, cx, cy, frame.spriteSourceSize.x, frame.spriteSourceSize.y, frame.sourceSize.w, frame.sourceSize.h );
 	}
 
 	public function loadTexturePackerJsonHash( data: TexturePackerJsonHash ) {
@@ -86,7 +86,7 @@ class Atlas {
 	}
 
 	function addNullFrame() {
-		addFrame( null, 0, 0, 0, 0, 0, 0, 0, 0 );
+		addFrame( null, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 	}
 
 	public function new() {
@@ -105,7 +105,9 @@ class Atlas {
 			toadd.push( macro {${atlas}.addFrame( 
 					$v{filename}, 
 					$v{frameData.x}, $v{frameData.y}, $v{frameData.w}, $v{frameData.h}, 
-					$v{cx}, $v{cy}, $v{frame.sourceSize.w}, $v{frame.sourceSize.h});});
+					$v{cx}, $v{cy}, 
+					$v{frame.spriteSourceSize.x}, $v{frame.spriteSourceSize.y},
+					$v{frame.sourceSize.w}, $v{frame.sourceSize.h});});
 		}
 		return macro $b{toadd};
 	}

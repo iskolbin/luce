@@ -12,7 +12,7 @@ class OpenFlAtlas extends Atlas {
 	public var centersFl(default,null) = new Array<Point>();
 
 	override function addFrame( key: String, x: Float, y: Float, w: Float, h: Float, cx: Float, cy: Float, srcX: Float, srcY: Float, srcW: Float, srcH: Float ) {
-		super.addFrame( key, x, y, w, h, cx, cy, srcW, srcH );
+		super.addFrame( key, x, y, w, h, cx, cy, srcX, srcY, srcW, srcH );
 		var rect = new Rectangle( x, y, w, h );
 		var center = new Point( cx, cy );
 		rectsFl.push( rect );
