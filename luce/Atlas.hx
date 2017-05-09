@@ -20,6 +20,7 @@ typedef TexturePackerJsonHash = {
 class Atlas {
 	public var ids(default,null) = new Map<String, Float>();
 	public var rects(default,null) = new Array<Vector<Float>>();
+	public var sourceRects(default,null) = new Array<Vector<Float>>()
 	public var centers(default,null) = new Array<Vector<Float>>();
 	public var sourceWidth(default,null) = new Array<Float>();
 	public var sourceHeight(default,null) = new Array<Float>();
@@ -33,7 +34,13 @@ class Atlas {
 	function addFrameRect( x: Float, y: Float, w: Float, h: Float ) {
 		var rect = new Vector<Float>( 4 );
 		rect[0] = x; rect[1] = y; rect[2] = w; rect[3] = h;
-		rects.push( rect );	
+		rects.push( rect );
+	}
+
+	function addSourceRect( x: Float, y: Float, w: Float, h: Float ) {
+		var rect = new Vector<Float>( 4 );
+		rect[0] = x; rect[1] = y; rect[2] = w; rect[3] = h;
+		sourceRects.push( rect );
 	}
 
 	function addFrameCenter( x: Float, y: Float ) {
@@ -42,10 +49,11 @@ class Atlas {
 		centers.push( point );	
 	}
 
-	public function addFrame( key: String, x: Float, y: Float, w: Float, h: Float, cx: Float, cy: Float, srcW: Float, srcH: Float ) {
+	public function addFrame( key: String, x: Float, y: Float, w: Float, h: Float, cx: Float, cy: Float, srcX: Float, srcY: Float, srcW: Float, srcH: Float ) {
 		var id = count++;
 
 		addFrameRect( x, y, w, h );
+		addSourceRect( srcX, srcY, srcW, srcH );
 		addFrameCenter( cx, cy );
 		
 		sourceWidth.push( srcW );
@@ -60,7 +68,7 @@ class Atlas {
 		var cx = frame.trimmed ? ( 0.5*frame.sourceSize.w - frame.spriteSourceSize.x ) : 0.5*frame.sourceSize.w;
 		var cy = frame.trimmed ? ( 0.5*frame.sourceSize.h - frame.spriteSourceSize.y ) : 0.5*frame.sourceSize.h;
 
-		addFrame( filename, frameData.x, frameData.y, frameData.w, frameData.h, cx, cy, frame.sourceSize.w, frame.sourceSize.h );
+		addFrame( filename, frameData.x, frameData.y, frameData.w, frameData.h, cx, cy, frame.sourceSize.x, frame.sourceSize.y, frame.sourceSize.w, frame.sourceSize.h );
 	}
 
 	public function loadTexturePackerJsonHash( data: TexturePackerJsonHash ) {
@@ -77,8 +85,12 @@ class Atlas {
 		framesCache[name] = framesFromStrings( frames );	
 	}
 
-	public function new() {
+	function addNullFrame() {
 		addFrame( null, 0, 0, 0, 0, 0, 0, 0, 0 );
+	}
+
+	public function new() {
+		addNullFrame();
 	}
 	
 	macro public static function unrollTexturePackerHashJson( atlas: ExprOf<Atlas>, path: String ) {

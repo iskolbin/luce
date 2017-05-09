@@ -2,10 +2,10 @@
 	"name": "luce",
 	"url" : "https://github.com/iskolbin/luce",
 	"license": "MIT",
-	"tags": ["openfl","kha","canvas"],
+	"tags": ["openfl","kha","html5","pixijs","canvas"],
 	"description": "Luce is minimal drawing library",
-	"version": "0.11.0",
-	"releasenote": "Added prev proxy for OpenFl CopyPixels backend",
+	"version": "0.12.0",
+	"releasenote": "Initial support for pixijs",
 	"contributors": ["iskolbin"],
 	"dependencies": {
 		"junge": ""

@@ -1,3 +1,7 @@
+// TODO
+// Current implementation is too ad-hoc and naive (i.e. crap)
+// Many options were added just to overcome crappy littera rasterization results
+// Should be fully compatible with AngleCode .fnt + should allow multiline
 package luce;
 
 import haxe.ds.Vector;
