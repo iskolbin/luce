@@ -14,13 +14,9 @@ class PixiAtlas extends Atlas {
 		this.baseTexture = base;
 	}
 
-	override function addNullFrame() {
-		textures.push( Texture.EMPTY );
-	}
-
 	override public function addFrame( key: String, x: Float, y: Float, w: Float, h: Float, cx: Float, cy: Float, srcX: Float, srcY: Float, srcW: Float, srcH: Float ) {
 		super.addFrame( key, x, y, w, h, cx, cy, srcX, srcY, srcW, srcH );
-		var texture = new Texture( this.baseTexture,
+		var texture = (w == 0 || h == 0 || srcW == 0 || srcH == 0) ? Texture.EMPTY : new Texture( this.baseTexture,
 				new Rectangle( x, y, w, h ),
 				new Rectangle( 0, 0, srcW, srcH ),
 				new Rectangle( srcX, srcY, w, h ), false );

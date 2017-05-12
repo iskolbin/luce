@@ -35,11 +35,11 @@ class PixiBatch extends Batch {
 	}
 
 	override inline public function setX( index: Int, v: Float )  { 
-		pixiSprites[index].x = v;
+		pixiSprites[index].x = v + centerX;
 	}
 	
 	override inline public function setY( index: Int, v: Float )  { 
-		pixiSprites[index].y = v;
+		pixiSprites[index].y = v + centerY;
 	}
 
 	override inline public function setFrame( index: Int, v: Float )  { 
