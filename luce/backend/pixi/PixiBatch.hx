@@ -3,18 +3,18 @@ package luce.backend.pixi;
 import luce.Batch;
 import luce.Widget;
 
-import pixi.sprites.Sprite;
-import pixi.display.Container;
+import pixi.core.sprites.Sprite;
+import pixi.core.display.Container;
 
 class PixiBatch extends Batch {
 	public var pixiSprites(default,null) = new Array<Sprite>();
 	public var pixiAtlas(default,null): PixiAtlas;
 	public var pixiParent(default,null): Container;
 
-	public function new( atlas: PixiAtlas, scissorRect: Array<Float>, parent?: Container ) {
+	public function new( atlas: PixiAtlas, scissorRect: Array<Float>, parent: Container ) {
 		super( atlas, scissorRect );
 		this.pixiAtlas = atlas;
-		this.pixiParent = parent != null ? parent : new Container();
+		this.pixiParent = parent;
 	}
 
 	override public function newWidget( args: Widget.WidgetConfig ) {
@@ -35,19 +35,16 @@ class PixiBatch extends Batch {
 	}
 
 	override inline public function setX( index: Int, v: Float )  { 
-		super.setX( index, v ); 
-		pixiSprites[index].x = getRList( index, 0 );
+		pixiSprites[index].x = v;
 	}
 	
 	override inline public function setY( index: Int, v: Float )  { 
-		super.setY( index, v ); 
-		pixiSprites[index].y = getRList( index, 1 );
+		pixiSprites[index].y = v;
 	}
 
 	override inline public function setFrame( index: Int, v: Float )  { 
-		super.setFrame( index, v ); 
-		pixiSprites[index].texture = pixiAtlas.textures[Std.int( v )] || pixiAtlas.textures[0];
-		pixiSprites[index].x = getRList( index, 0 );// - atlas.centers[sprites[index].id][0];
-		pixiSprites[index].y = getRList( index, 1 );// - atlas.centers[sprites[index].id][1];
+		var tIdx = Std.int( v );
+		var ts = this.pixiAtlas.textures;
+		pixiSprites[index].texture = tIdx < ts.length ? ts[tIdx] : ts[0];
 	}
 }
