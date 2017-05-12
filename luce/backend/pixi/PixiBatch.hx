@@ -9,12 +9,12 @@ import pixi.core.display.Container;
 class PixiBatch extends Batch {
 	public var pixiSprites(default,null) = new Array<Sprite>();
 	public var pixiAtlas(default,null): PixiAtlas;
-	public var pixiParent(default,null): Container;
+	public var parent(default,null): Container;
 
 	public function new( atlas: PixiAtlas, scissorRect: Array<Float>, parent: Container ) {
 		super( atlas, scissorRect );
 		this.pixiAtlas = atlas;
-		this.pixiParent = parent;
+		this.parent = parent;
 	}
 
 	override public function newWidget( args: Widget.WidgetConfig ) {
@@ -22,7 +22,7 @@ class PixiBatch extends Batch {
 		sprite.anchor.x = 0.5;
 		sprite.anchor.y = 0.5;
 		pixiSprites.push( sprite );
-		pixiParent.addChild( sprite );
+		parent.addChild( sprite );
 		return super.newWidget( args );
 	}
 	
