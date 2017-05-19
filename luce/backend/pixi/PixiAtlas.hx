@@ -22,4 +22,8 @@ class PixiAtlas extends Atlas {
 				new Rectangle( srcX, srcY, w, h ), false );
 		textures.push( texture );
 	}
+
+	override public function release() {
+		baseTexture.dispose();
+	}
 }

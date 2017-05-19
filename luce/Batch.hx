@@ -162,4 +162,7 @@ class Batch {
 	public inline function byName( name: String ) {
 		return namedWidgets[name];
 	}
+
+	public function release() {
+	}
 }

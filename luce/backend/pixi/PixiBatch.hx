@@ -47,4 +47,10 @@ class PixiBatch extends Batch {
 		var ts = this.pixiAtlas.textures;
 		pixiSprites[index].texture = tIdx < ts.length ? ts[tIdx] : ts[0];
 	}
+
+	override function release() {
+		for ( sprite in pixiSprites ) {
+			parent.removeChild( sprite );
+		}
+	}
 }

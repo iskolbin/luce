@@ -111,4 +111,7 @@ class Atlas {
 		}
 		return macro $b{toadd};
 	}
+
+	public function release() {
+	}
 }
